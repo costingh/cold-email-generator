@@ -1,5 +1,5 @@
 import React from "react";
-import { withProtected } from "../src/hook/route";
+import { withProtected } from "../hook/route";
 
 function Admin({ auth }) {
 	const { logout } = auth;

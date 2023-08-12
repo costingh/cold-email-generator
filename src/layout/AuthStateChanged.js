@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import useAuth from "../hook/auth";
-import AuthService from "../service/AuthService";
+import AuthService from "../service/AuthService.ts";
 
 export default function AuthStateChanged({ children }) {
 	const { setUser } = useAuth();

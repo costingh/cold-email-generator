@@ -7,8 +7,8 @@ export function withPublic(Component) {
 		const auth = useAuth();
 		const router = useRouter();
 
-		if (auth.user) {
-			router.replace("/");
+		if (auth?.user) {
+			router.replace("/dashboard?view=customers");
 			return <h1>Loading...</h1>;
 		}
 		return <Component auth={auth} {...props} />;
@@ -20,8 +20,8 @@ export function withProtected(Component) {
 		const auth = useAuth();
 		const router = useRouter();
 
-		if (!auth.user) {
-			router.replace("/login");
+		if (!auth?.user) {
+			router.push("/login");
 			return <h1>Loading...</h1>;
 		}
 		return <Component auth={auth} {...props} />;

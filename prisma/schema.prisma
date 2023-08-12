@@ -1,0 +1,91 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          Int      @id @default(autoincrement())
+  email       String   @unique
+  name        String
+  providerId  String
+  uid         String
+  photoURL    String
+  phoneNumber String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Campaign {
+  id                 Int               @id @default(autoincrement())
+  name               String
+  description        String?
+  status             String // Use an ENUM type for better database representation
+  templateId         String
+  // Define relationships
+  segments           Segment[] // A campaign can be associated with multiple segments
+  schedule           CampaignSchedule? @relation(fields: [campaignScheduleId], references: [id])
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt
+  campaignScheduleId Int?
+}
+
+model Segment {
+  id              Int        @id @default(autoincrement())
+  name            String
+  description     String?
+  // Define criteria
+  industry        String?
+  location        String?
+  jobTitle        String?
+  engagementLevel String?
+  interests       String[]
+  // Define relationships
+  contacts        Contact[] // A segment can have multiple contacts
+  campaigns       Campaign[] // A segment can be associated with multiple campaigns
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+}
+
+model Contact {
+  id          Int       @id @default(autoincrement())
+  email       String    @unique
+  name        String
+  phoneNumber String?
+  company     String?
+  position    String?
+  // Define relationships
+  segments    Segment[] // A contact can belong to multiple segments
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+enum CampaignStatus {
+  DRAFT
+  ACTIVE
+  PAUSED
+  COMPLETED
+}
+
+model CampaignSchedule {
+  id        Int                @id @default(autoincrement())
+  type      String
+  startDate DateTime
+  recurring RecurringOptions[]
+  createdAt DateTime           @default(now())
+  updatedAt DateTime           @updatedAt
+  Campaign  Campaign[]
+}
+
+model RecurringOptions {
+  id                 Int               @id @default(autoincrement())
+  frequency          String
+  interval           Int
+  campaignScheduleId Int?
+  CampaignSchedule   CampaignSchedule? @relation(fields: [campaignScheduleId], references: [id])
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt
+}

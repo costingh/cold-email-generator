@@ -9,21 +9,9 @@ export default function AppLayout({ children }) {
 
 	if (router.pathname !== "/login") {
 		return (
-			<main>
-				<nav
-					style={{
-						background: "blue",
-						color: "white",
-						padding: "10px",
-						display: "flex",
-						justifyContent: "space-between",
-					}}
-				>
-					<span>This is default layout</span>
-					<span>{auth.user?.displayName}</span>
-				</nav>
+			<div style={{height: '100%'}}>
 				{children}
-			</main>
+			</div>
 		);
 	} else {
 		return children;
