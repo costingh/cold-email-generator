@@ -2,8 +2,6 @@ import { prisma } from "@lib/prisma";
 
 
 export default async function handler(req: { method: string; body: { user: any; }; }, res: { send: (arg0: { users?: never[] | { id: number; email: string; name: string; providerId: string; uid: string; photoURL: string; phoneNumber: string; }[]; error: any; response?: { id: number; email: string; name: string; providerId: string; uid: string; photoURL: string; phoneNumber: string; } | null; message?: string; status?: number; }) => void; }) {
-	
-	console.log('#################################')
 	if (prisma) {
 		if (req.method === "GET") {
 			try {

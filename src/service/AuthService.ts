@@ -39,14 +39,15 @@ class AuthService {
 					}
 
 					UsersService.createUser(userToSave, (err, resp) => {
-						if (err) return { error: err }
-						else return { response: resp }
+						if (err) return { error: err, user: null }
+						else return { error: null, user: resp }
 					})
-				} else return {error: 'Could not create user'};
+				} else return {error: 'Could not create user', user: null};
 			})
 			.catch((error) => {
 				return {
 					error: error.message,
+					user: null
 				};
 			});
 	}

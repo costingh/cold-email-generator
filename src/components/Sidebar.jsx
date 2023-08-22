@@ -1,42 +1,241 @@
-import React, {useState} from "react";
+import React, { useState } from "react";
 import { useRouter } from 'next/router';
 import CustomersSidebar from '../layout/customers/CustomersSidebar'
 import CampaignsSidebar from '../layout/campaigns/CampaignsSidebar'
 import ConversationsSidebar from '../layout/conversations/ConversationsSidebar'
 import useAuth from "/src/hook/auth";
+import ContactsService from "@services/contacts.service";
+import ImportContact from "./modals/ImportContact";
+import CreateSegment from "./modals/CreateSegment";
+import segmentsService from "@services/segments.service";
 
-function Sidebar({customersData, setCustomersData}) {
+function Sidebar({
+	contactsData,
+	setContactsData,
+	addNewContact,
+	addNewSegment,
+	segments,
+	isCreateCustomerModalOpened,
+	isCreateSegmentModalOpened,
+	setIsCreateCustomerModalOpened,
+	setIsCreateSegmentModalOpened,
+	handleSaveContacts,
+	importingContacts,
+	contactsImported,
+	activeCampaigns,
+	draftCampaigns
+}) {
 	const router = useRouter();
 	const { user } = useAuth();
 
-	const [isCreateCustomerModalOpened, setIsCreateCustomerModalOpened] = useState(false)
+	const [addingContact, setAddingContact] = useState(false)
+	const [creatingSegment, setCreatingSegment] = useState(false)
+
+	const [message, setMessage] = useState({
+		success: '',
+		error: ''
+	})
+
 	const navigateTo = route => {
 		router.push(
 			{
-			  pathname: '/dashboard',
-			  query: { view: route },
+				pathname: '/dashboard',
+				query: { view: route },
 			},
 			undefined,
-			{ shallow: true } 
-		  );
+			{ shallow: true }
+		);
 	}
 
 	const handleOpenCreateContactModal = () => {
 		setIsCreateCustomerModalOpened(true)
+		let bodyEl = document.querySelector('body');
+		if (bodyEl) bodyEl.style.overflow = 'hidden'
+	}
+
+	const handleOpenCreateSegmentModal = () => {
+		setIsCreateSegmentModalOpened(true)
+		let bodyEl = document.querySelector('body');
+		if (bodyEl) bodyEl.style.overflow = 'hidden'
 	}
 
 
+	const [newContactData, setNewContactData] = useState({
+		email: '',
+		name: '',
+		phoneNumber: '',
+		company: '',
+		job_title: '',
+		location: '',
+		education: '',
+		biography: '',
+		links: [],
+		interests: [],
+		social_media: [],
+		// segments: [],
+		user_email: user?.email
+	})
+
+	const [segmentData, setSegmentData] = useState({
+		name: '',
+		description: '',
+		industry: '',
+		location: '',
+		jobTitle: '',
+		interests: [],
+		user_email: user?.email
+	});
+
+	const handleChange = (e, type) => {
+		switch (type) {
+
+
+			//////////////////////////////
+			// 		CREATE CONTACT		//
+			//////////////////////////////
+			case 'email':
+				setNewContactData({ ...newContactData, email: e.target.value })
+				break;
+			case 'name':
+				setNewContactData({ ...newContactData, name: e.target.value })
+				break;
+			case 'phoneNumber':
+				setNewContactData({ ...newContactData, phoneNumber: e.target.value })
+				break;
+			case 'company':
+				setNewContactData({ ...newContactData, company: e.target.value })
+				break;
+			case 'job_title':
+				setNewContactData({ ...newContactData, job_title: e.target.value })
+				break;
+			case 'location':
+				setNewContactData({ ...newContactData, location: e.target.value })
+				break;
+			case 'education':
+				setNewContactData({ ...newContactData, education: e.target.value })
+				break;
+			case 'biography':
+				setNewContactData({ ...newContactData, biography: e.target.value })
+				break;
+
+			//////////////////////////////
+			// 		CREATE SEGMENT		//
+			//////////////////////////////
+			case 'segment_name':
+				setSegmentData({ ...segmentData, name: e.target.value })
+				break;
+			case 'segment_description':
+				setSegmentData({ ...segmentData, description: e.target.value })
+				break;
+			case 'segment_criteria_industry':
+				setSegmentData({ ...segmentData, industry: e.target.value })
+				break;
+			case 'segment_criteria_location':
+				setSegmentData({ ...segmentData, location: e.target.value })
+				break;
+			case 'segment_criteria_jobtitle':
+				setSegmentData({ ...segmentData, jobTitle: e.target.value })
+				break;
+			case 'segment_criteria_interests':
+				setSegmentData({ ...segmentData, interests: [e.target.value] })
+				break;
+
+
+			default:
+				break;
+		}
+
+	}
+
+	const createSegment = () => {
+		setCreatingSegment(true)
+		segmentsService.createSegment(segmentData, (error, res) => {
+			console.log(res)
+			console.log(error)
+
+			if (error || res?.error) {
+				setCreatingSegment(false)
+				setMessage({
+					error: 'Could not add this conctact',
+					success: ''
+				})
+			}
+			if (res?.response) {
+				addNewSegment(res?.response)
+				resetFormData()
+				setCreatingSegment(false)
+				setMessage({
+					error: '',
+					success: 'Contact added successfully'
+				})
+			}
+		})
+	}
+
+	const addContact = () => {
+		setAddingContact(true)
+		ContactsService.createContact(newContactData, (error, res) => {
+			if (error || res?.error) {
+				setAddingContact(false)
+				setMessage({
+					error: 'Could not add this conctact',
+					success: ''
+				})
+			}
+			if (res?.response) {
+				addNewContact(res?.response)
+				resetFormData()
+				setAddingContact(false)
+				setMessage({
+					error: '',
+					success: 'Contact added successfully'
+				})
+			}
+		})
+	}
+
+	const closeModal = () => {
+		setIsCreateCustomerModalOpened(false)
+		setIsCreateSegmentModalOpened(false)
+
+		resetFormData()
+		let bodyEl = document.querySelector('body');
+		if (bodyEl) bodyEl.style.overflow = 'auto'
+	}
+
+	const resetFormData = () => {
+		setNewContactData({
+			email: '',
+			name: '',
+			phoneNumber: '',
+			company: '',
+			job_title: '',
+			location: '',
+			education: '',
+			biography: '',
+			segments: [],
+			links: [],
+			interests: [],
+			social_media: [],
+		})
+	}
 	return (
 		<div className="sidebar">
-			{isCreateCustomerModalOpened && 
-				<div id="createCustomerModal">
-					<div>
-						<h1>Create Customer</h1>	
-					</div>
-				</div>
+
+			{isCreateSegmentModalOpened && <CreateSegment closeModal={closeModal} handleChange={handleChange} creatingSegment={creatingSegment} createSegment={createSegment} />}
+			{isCreateCustomerModalOpened &&
+				<ImportContact
+					closeModal={closeModal}
+					handleChange={handleChange}
+					addingContact={addingContact}
+					addContact={addContact}
+					handleSaveContacts={handleSaveContacts}
+					importingContacts={importingContacts}
+					contactsImported={contactsImported}
+				/>
 			}
 			<div className="mini-sidebar">
-				<div className={`mini-sidebar-item ${router?.query?.view == 'customers' && 'active'}`} onClick={() => navigateTo('customers')}>
+				<div className={`mini-sidebar-item ${router?.query?.view == 'contacts' && 'active'}`} onClick={() => navigateTo('contacts')}>
 					<svg
 						viewBox="0 0 24 24"
 						width="24"
@@ -133,11 +332,11 @@ function Sidebar({customersData, setCustomersData}) {
 				<div className="section-end"></div>
 			</div>
 
-			{router?.query?.view == 'customers' && <CustomersSidebar setCustomersData={setCustomersData} customersData={customersData} handleOpenCreateContactModal={handleOpenCreateContactModal}/>}
-			{router?.query?.view == 'campaigns' && <CampaignsSidebar setCustomersData={setCustomersData} customersData={customersData}/>}
-			{router?.query?.view == 'conversations' && <ConversationsSidebar setCustomersData={setCustomersData} customersData={customersData}/>}
+			{router?.query?.view == 'contacts' && <CustomersSidebar setContactsData={setContactsData} contactsData={contactsData} handleOpenCreateContactModal={handleOpenCreateContactModal} segments={segments} handleOpenCreateSegmentModal={handleOpenCreateSegmentModal} />}
+			{router?.query?.view == 'campaigns' && <CampaignsSidebar setContactsData={setContactsData} contactsData={contactsData} activeCampaigns={activeCampaigns} draftCampaigns={draftCampaigns} />}
+			{router?.query?.view == 'conversations' && <ConversationsSidebar setContactsData={setContactsData} contactsData={contactsData} />}
 
-			
+
 		</div>
 	);
 }

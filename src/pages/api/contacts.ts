@@ -1,19 +1,26 @@
 import { prisma } from "@lib/prisma";
 
 
-export default async function contacts(req: { method: string; body: { contact: any; }; }, res: { send: (arg0: { contacts?: any; error: any; response?: any; message?: string; status?: number; }) => void; }) {
+export default async function contacts(req: { method: string; query: { userEmail: string }; body: { contact: any; }; }, res: { send: (arg0: { contacts?: any; error: any; response?: any; message?: string; status?: number; }) => void; }) {
 	if (prisma) {
 		if (req.method === "GET") {
 			try {
-				const contacts = await prisma.contact.findMany();
+				const userEmail = req.query.userEmail || '';
+                const contacts = await prisma.contact.findMany({
+                    where: {
+                        user_email: { contains: userEmail },
+                    },
+                });
 				res.send({
 					contacts: contacts,
 					error: null,
+					status: 201
 				});
 			} catch (error : any) {
 				res.send({
 					error: error.message,
 					contacts: [],
+					status: 500
 				});
 			}
 		} else if (req.method === "POST") {

@@ -29,7 +29,7 @@ function ConversationsSidebar() {
                 <span>Create Contact</span>
             </div>
 
-            <div className="sidebar-title">This is a list of contacts</div>
+            <div className="sidebar-title">This is a list of conversations</div>
 
             <div className="item">
                 <div>

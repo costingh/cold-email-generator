@@ -10,13 +10,18 @@
   },
   "dependencies": {
     "@prisma/client": "^5.1.1",
+    "async": "^3.2.4",
     "autoprefixer": "^10.4.14",
     "axios": "^1.4.0",
+    "csv-parser": "^3.0.0",
     "firebase": "^9.2.0",
+    "fs": "^0.0.1-security",
+    "moment": "^2.29.4",
     "next": "^13.4.12",
     "prisma": "^5.1.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-papaparse": "^4.1.0",
     "tailwindcss": "^3.3.3",
     "ts-node": "^10.9.1"
   },
@@ -25,5 +30,10 @@
     "eslint": "7.31.0",
     "eslint-config-next": "^13.4.12",
     "typescript": "^5.1.6"
+  },
+  "browser": {
+    "fs": false,
+    "os": false,
+    "path": false
   }
 }

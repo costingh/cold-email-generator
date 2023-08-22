@@ -8,7 +8,7 @@ export function withPublic(Component) {
 		const router = useRouter();
 
 		if (auth?.user) {
-			router.replace("/dashboard?view=customers");
+			router.replace("/dashboard?view=contacts");
 			return <h1>Loading...</h1>;
 		}
 		return <Component auth={auth} {...props} />;

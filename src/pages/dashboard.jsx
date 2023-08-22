@@ -1,7 +1,7 @@
 import React from 'react'
 import dynamic from 'next/dynamic';
-const Dashboard = dynamic(() => import('/src/content/dashboard/Dashboard'));
 import { withProtected } from "../hook/route";
+import Dashboard from 'src/content/dashboard/Dashboard';
 
 function dashboard() {
   return (

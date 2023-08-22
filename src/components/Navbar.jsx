@@ -8,7 +8,7 @@ function Navbar() {
 	return (
 		<div className="navbar" style={{ position: 'relative' }}>
 
-			<div>LOGO</div>
+			<div>Quixly</div>
 			<div className="right-actions">
 				{user ?
 					<div className="d-flex align-items-center" style={{ columnGap: '20px' }}>
