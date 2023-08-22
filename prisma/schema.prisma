@@ -8,15 +8,17 @@ datasource db {
 }
 
 model User {
-  id          Int      @id @default(autoincrement())
-  email       String   @unique
+  id          Int       @id @default(autoincrement())
+  email       String    @unique
   name        String
   providerId  String
   uid         String
   photoURL    String
   phoneNumber String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  segments    Segment[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  Contact     Contact[]
 }
 
 model Campaign {
@@ -25,7 +27,6 @@ model Campaign {
   description        String?
   status             String // Use an ENUM type for better database representation
   templateId         String
-  // Define relationships
   segments           Segment[] // A campaign can be associated with multiple segments
   schedule           CampaignSchedule? @relation(fields: [campaignScheduleId], references: [id])
   createdAt          DateTime          @default(now())
@@ -34,33 +35,51 @@ model Campaign {
 }
 
 model Segment {
-  id              Int        @id @default(autoincrement())
+  id              Int              @id @default(autoincrement())
   name            String
   description     String?
-  // Define criteria
   industry        String?
   location        String?
   jobTitle        String?
   engagementLevel String?
   interests       String[]
-  // Define relationships
-  contacts        Contact[] // A segment can have multiple contacts
+  user_email      String
+  User            User             @relation(fields: [user_email], references: [email])
   campaigns       Campaign[] // A segment can be associated with multiple campaigns
-  createdAt       DateTime   @default(now())
-  updatedAt       DateTime   @updatedAt
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  contacts        ContactSegment[] // Relation to junction table
 }
 
 model Contact {
-  id          Int       @id @default(autoincrement())
-  email       String    @unique
-  name        String
-  phoneNumber String?
-  company     String?
-  position    String?
-  // Define relationships
-  segments    Segment[] // A contact can belong to multiple segments
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id           Int              @id @default(autoincrement())
+  email        String           @unique
+  name         String
+  phoneNumber  String?
+  company      String?
+  job_title    String?
+  location     String?
+  education    String?
+  biography    String?
+  user_email   String
+  User         User             @relation(fields: [user_email], references: [email])
+  links        String[]
+  social_media String[]
+  interests    String[]
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+  segments     ContactSegment[]
+}
+
+// Junction table to manage Contact-Segment relationship
+model ContactSegment {
+  id        Int      @id @default(autoincrement())
+  contact   Contact? @relation(fields: [contactId], references: [id])
+  contactId Int?
+  segment   Segment? @relation(fields: [segmentId], references: [id])
+  segmentId Int?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 enum CampaignStatus {
