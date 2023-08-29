@@ -141,6 +141,10 @@ html {
   color: #a67fff;
 }
 
+.w-100 {
+  width: 100%;
+}
+
 .ml-1 {
   margin-left: 5px !important;
 }
@@ -206,7 +210,7 @@ html {
 .inner-content {
   display: flex;
   width: 100%;
-  height: 100%;
+  height: calc(100% - 54px);
 }
 
 .sidebar {
@@ -413,6 +417,7 @@ html {
 .dashboard-content {
   width: 100%;
   padding: 0px 20px;
+  overflow-y: auto;
 }
 
 .d-flex {
@@ -739,8 +744,13 @@ html {
   column-gap: 15px;
 }
 
+.alert-container div {
+  width: 10%;
+}
+
 .alert-container svg {
-  width: 50px;
+  width: 30px;
+  filter: invert(68%) sepia(60%) saturate(506%) hue-rotate(350deg) brightness(86%) contrast(91%);
 }
 
 .alert-container p {
@@ -748,6 +758,7 @@ html {
   font-weight: 500;
   color: #d3993d;
   text-align: justify;
+  width: 90%;
 }
 
 @keyframes rotate {
@@ -884,13 +895,18 @@ span.muted-text {
 }
 
 .campaigns-page-wrapper .navbar-campaigns .step svg {
-  width: 14px;
+  width: 15px;
+  filter: invert(29%) sepia(0%) saturate(1074%) hue-rotate(289deg) brightness(95%) contrast(95%);
 }
 
 .step.active {
   border-color: #8f5fff !important;
   color: #8f5fff !important;
   background-color: #a57fff1e;
+}
+
+.step.active svg {
+  filter: invert(49%) sepia(67%) saturate(5084%) hue-rotate(236deg) brightness(101%) contrast(101%) !important;
 }
 
 .campaign-editor-panel {
@@ -1036,7 +1052,8 @@ span.muted-text {
 }
 
 .create-campaign-wrapper input,
-.create-campaign-wrapper textarea {
+.create-campaign-wrapper textarea,
+.create-campaign-wrapper .editable-container {
   border: 1px solid #ccccccd7;
   border-radius: 8px;
   padding: 5px 10px;
@@ -1252,16 +1269,19 @@ span.muted-text {
 
 .preview-btn {
   border: 1px solid #8f5fff;
-  border-radius: 15px;
+  border-radius: 10px;
   background-color: #8f5fff;
   column-gap: 6px;
-  padding: 5px 8px;
+  padding: 3px 8px;
   transform: all 0.2s ease;
+  font-weight: 600;
+  font-size: 13px;
   cursor: pointer;
 }
 
 .preview-btn svg {
-  width: 14px;
+  width: 16px;
+  filter: invert(99%) sepia(4%) saturate(0%) hue-rotate(203deg) brightness(112%) contrast(87%);
 }
 
 .preview-btn p {
@@ -1327,4 +1347,37 @@ span.muted-text {
 .csv-variables span {
   border-color: #ccccccd7;
   color: #888;
+}
+
+/* input:focus, textarea:focus {
+  outline: 1px solid  #4b4a4a;
+} */
+
+.next-icon svg {
+  color: #ccccccd7;
+}
+
+.coloredText {
+  color: #8f5fff;
+}
+
+
+
+
+/* //////////////////////////////////////////////////////////////////////////// */
+
+
+
+
+.error-msg {
+  text-align: center;
+  font-size: 14px;
+  font-weight: 600;
+  color: rgb(231, 69, 69);
+  margin-top: 10px;
+  display: none;
+}
+
+.error-msg.show {
+  display: block;
 }
