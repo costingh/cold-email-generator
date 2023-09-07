@@ -10,6 +10,10 @@ import useAuth from "/src/hook/auth";
 import async from "async"
 import campaignService from '@services/campaign.service';
 
+// redux
+import { selectContactsState, setContactsState } from "@store/contactsSlice";
+import { useDispatch, useSelector } from "react-redux";
+
 const _MOCK_CONTACTS = [
 	{
 		name: 'Alan Macin',
@@ -59,6 +63,9 @@ export default function Dashboard() {
 	const [activeCampaigns, setActiveCampaigns] = useState([])
 	const [draftCampaigns, setDraftCampaigns] = useState([])
 
+	const contactsSlice = useSelector(selectContactsState);
+    const dispatch = useDispatch();
+
 	const onPageChange = (page) => {
 		setCurrentPage(page);
 	};
@@ -69,7 +76,8 @@ export default function Dashboard() {
 		if (view == 'contacts' && !router?.query?.segment) {
 			setLoading(true)
 			ContactsService.getContacts(user?.email, (error, contacts) => {
-				setContactsData(contacts)
+				// setContactsData(contacts)
+				dispatch(setContactsState(contacts))
 				setLoading(false)
 			})
 			segmentsService.getSegments(user?.email, (error, segments) => {
@@ -129,7 +137,6 @@ export default function Dashboard() {
 			<Navbar />
 			<div className='inner-content'>
 				<Sidebar
-					contactsData={contactsData}
 					setContactsData={setContactsData}
 					addNewContact={addNewContact}
 					segments={segments}
@@ -145,7 +152,6 @@ export default function Dashboard() {
 					draftCampaigns={draftCampaigns}
 				/>
 				<DashboardContent
-					contactsData={contactsData}
 					loadingContacts={loading}
 					setContactsData={setContactsData}
 					items={contactsData.length}

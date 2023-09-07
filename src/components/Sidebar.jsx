@@ -10,7 +10,6 @@ import CreateSegment from "./modals/CreateSegment";
 import segmentsService from "@services/segments.service";
 
 function Sidebar({
-	contactsData,
 	setContactsData,
 	addNewContact,
 	addNewSegment,
@@ -150,9 +149,6 @@ function Sidebar({
 	const createSegment = () => {
 		setCreatingSegment(true)
 		segmentsService.createSegment(segmentData, (error, res) => {
-			console.log(res)
-			console.log(error)
-
 			if (error || res?.error) {
 				setCreatingSegment(false)
 				setMessage({
@@ -173,9 +169,7 @@ function Sidebar({
 	}
 
 	const addContact = () => {
-		console.log('aici')
 		setAddingContact(true)
-		console.log(newContactData)
 		ContactsService.createContact(newContactData, (error, res) => {
 			console.log(err || res)
 			if (error || res?.error) {
@@ -335,9 +329,9 @@ function Sidebar({
 				<div className="section-end"></div>
 			</div>
 
-			{router?.query?.view == 'contacts' && <CustomersSidebar setContactsData={setContactsData} contactsData={contactsData} handleOpenCreateContactModal={handleOpenCreateContactModal} segments={segments} handleOpenCreateSegmentModal={handleOpenCreateSegmentModal} />}
-			{router?.query?.view == 'campaigns' && <CampaignsSidebar setContactsData={setContactsData} contactsData={contactsData} activeCampaigns={activeCampaigns} draftCampaigns={draftCampaigns} />}
-			{router?.query?.view == 'conversations' && <ConversationsSidebar setContactsData={setContactsData} contactsData={contactsData} />}
+			{router?.query?.view == 'contacts' && <CustomersSidebar handleOpenCreateContactModal={handleOpenCreateContactModal} segments={segments} handleOpenCreateSegmentModal={handleOpenCreateSegmentModal} />}
+			{router?.query?.view == 'campaigns' && <CampaignsSidebar activeCampaigns={activeCampaigns} draftCampaigns={draftCampaigns} />}
+			{router?.query?.view == 'conversations' && <ConversationsSidebar />}
 
 
 		</div>

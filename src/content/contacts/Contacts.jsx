@@ -5,8 +5,10 @@ import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/router';
 import moment from 'moment'
 
+import { selectContactsState, setContactsState } from "@store/contactsSlice";
+import { useDispatch, useSelector } from "react-redux";
+
 function Contacts({
-    contactsData,
     loadingContacts,
     items,
     currentPage,
@@ -21,15 +23,27 @@ function Contacts({
     const [currentSegment, setCurrentSegment] = useState(null)
 
     useEffect(() => {
-        const paginatedContacts = paginate(contactsData, currentPage, pageSize);
-        setPaginatedData(paginatedContacts)
-    }, [contactsData, currentPage, pageSize])
+        setCurrentSegment(segments.find(seg => seg.name === segment) || null)
+        console.log(segments.find(seg => seg.name === segment))
 
+        
+		dispatch(setContactsState([]))
+    }, [segment])
+
+    const contactsSlice = useSelector(selectContactsState);
+    const dispatch = useDispatch();
 
     useEffect(() => {
-        setCurrentSegment(segments.find(seg => seg.name === segment))
-        console.log(segments)
-    }, [segment])
+        const paginatedContacts = paginate(contactsSlice, currentPage, pageSize);
+        setPaginatedData(paginatedContacts)
+    }, [contactsSlice, currentPage, pageSize])
+
+    // useEffect(() => {
+    //     const paginatedContacts = paginate(contactsData, currentPage, pageSize);
+    //     setPaginatedData(paginatedContacts)
+    // }, [contactsData, currentPage, pageSize])
+
+    // dispatch(setContactsState(contacts))
 
     return (
         <>
@@ -54,7 +68,7 @@ function Contacts({
                 <div className='segment-data'>
                     <div className='mt-3'>
                         <span className='section-title'>Industry: </span>
-                        {currentSegment?.industry?.split(',').map(i => <span className='pill ml-2 mr-2'>{i}</span>)}
+                        {currentSegment?.industry?.split(',').map(i => <span className='pill ml-2 mr-2'>{i || '-'}</span>)}
                     </div>
 
                     <div className='mt-3'>
@@ -64,12 +78,12 @@ function Contacts({
 
                     <div className='mt-3'>
                         <span className='section-title'>Job titles: </span>
-                        {currentSegment?.jobTitle?.split(',').map(i => <span className='pill ml-2 mr-2'>{i}</span>)}
+                        {currentSegment?.jobTitle?.split(',').map(i => <span className='pill ml-2 mr-2'>{i || '-'}</span>)}
                     </div>
 
                     <div className='mt-3'>
                         <span className='section-title'>Locations: </span>
-                        {currentSegment?.location?.split(',').map(i => <span className='pill ml-2 mr-2'>{i}</span>)}
+                        {currentSegment?.location?.split(',').map(i => <span className='pill ml-2 mr-2'>{i || '-'}</span>)}
                     </div>
                 </div>
             }

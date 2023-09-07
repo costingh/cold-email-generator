@@ -3,7 +3,7 @@ import { useRouter } from 'next/router';
 import segmentsService from "@services/segments.service";
 import Icon from "@components/Icon";
 
-function CustomersSidebar({ contactsData, setContactsData, handleOpenCreateContactModal, segments, handleOpenCreateSegmentModal }) {
+function CustomersSidebar({handleOpenCreateContactModal, segments, handleOpenCreateSegmentModal }) {
     const router = useRouter();
     const [lists, setLists] = useState([])
     const [isSegmentsMenuOpened, setIsSegmentsMenuOpened] = useState(false)
