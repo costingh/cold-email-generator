@@ -173,8 +173,11 @@ function Sidebar({
 	}
 
 	const addContact = () => {
+		console.log('aici')
 		setAddingContact(true)
+		console.log(newContactData)
 		ContactsService.createContact(newContactData, (error, res) => {
+			console.log(err || res)
 			if (error || res?.error) {
 				setAddingContact(false)
 				setMessage({
