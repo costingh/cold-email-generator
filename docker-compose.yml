@@ -12,7 +12,7 @@ services:
   postgres-db:
     build:
       context: ./postgres
-      restart: always
       dockerfile: Dockerfile.postgres
+    restart: always
     ports:
       - "5432:5432"
