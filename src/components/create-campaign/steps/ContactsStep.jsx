@@ -48,7 +48,8 @@ function ContactsStep({
                         <div className='segment-data'>
                             <div className='mt-3 d-flex align-items-center'>
                                 <span className='section-title'>Industry: </span>
-                                <div className='inner-section'>{segment?.industry?.split(',').map(i => <span className='pill ml-2 mr-2'>{i}</span>)}</div>
+                                {segment?.industry && <div className='inner-section'>{segment?.industry?.split(',').map(i => <span className='pill ml-2 mr-2'>{i}</span>)}</div>}
+                                {!segment?.industry && <span className='pill ml-2 mr-2' style={{textAlign: 'center'}}>-</span>}
                             </div>
 
                             <div className='mt-3 d-flex align-items-center'>
@@ -60,16 +61,18 @@ function ContactsStep({
 
                             <div className='mt-3 d-flex align-items-center'>
                                 <span className='section-title'>Job titles: </span>
-                                <div className='inner-section'>
+                                {segment?.jobTitle && <div className='inner-section'>
                                     {segment?.jobTitle?.split(',').map(i => <span className='pill ml-2 mr-2'>{i}</span>)}
-                                </div>
+                                </div>}
+                                {!segment?.jobTitle && <span className='pill ml-2 mr-2' style={{textAlign: 'center'}}>-</span>}
                             </div>
 
                             <div className='mt-3 d-flex align-items-center'>
                                 <span className='section-title'>Locations: </span>
-                                <div className='inner-section'>
+                                {segment?.location && <div className='inner-section'>
                                     {segment?.location?.split(',').map(i => <span className='pill ml-2 mr-2'>{i}</span>)}
-                                </div>
+                                </div>}
+                                {!segment?.location && <span className='pill ml-2 mr-2' style={{textAlign: 'center'}}>-</span>}
                             </div>
                         </div>
                     </div>
