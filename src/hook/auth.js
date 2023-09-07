@@ -21,7 +21,7 @@ export function AuthProvider(props) {
 		await AuthService.logout();
 		setUser(null);
 	};
-	const value = { user, error, loginWithGoogle, logout, setUser };
+	const value = { user, error, loginWithGoogle, logout, setUser, setError };
 
 	return <authContext.Provider value={value} {...props} />;
 }

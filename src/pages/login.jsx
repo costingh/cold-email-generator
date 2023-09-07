@@ -1,10 +1,11 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { withPublic } from "../hook/route";
 
 function Login({ auth }) {
-	const { user, loginWithGoogle, error } = auth;
-	return (
-		<div className='d-flex align-items-center justify-content-center login-wrapper'>
+    const { user, loginWithGoogle, error } = auth;
+
+    return (
+        <div className='d-flex align-items-center justify-content-center login-wrapper'>
             <div>
                 <h1>Log in or sign up to use this app</h1>
                 <div className='btn-outline d-flex align-items-center justify-content-center mb-4' onClick={loginWithGoogle}>
@@ -20,14 +21,18 @@ function Login({ auth }) {
                 </div>
 
                 <div className='email-input-login'>
-                    <span>Email</span>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <span>Email</span>
+                        {error && <span style={{color: 'red'}}>{error}</span>}
+                    </div>
+
                     <input className="mb-4" type='email' placeholder='Enter email address' />
                     <div className='btn-filled'>Continue with email</div>
                     <span className='mini-text'>By continuing, you acknowledge that you have read and understood, and agree to Mobbin's <a>Terms of Service</a> and <a>Privacy Policy</a>.</span>
                 </div>
             </div>
         </div>
-	);
+    );
 }
 
 export default withPublic(Login);

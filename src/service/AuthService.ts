@@ -37,11 +37,10 @@ class AuthService {
 						photoURL: userCred.user.providerData[0].photoURL || '',
 						phoneNumber: userCred.user.providerData[0].phoneNumber || '',
 					}
-
-					UsersService.createUser(userToSave, (err, resp) => {
-						if (err) return { error: err, user: null }
-						else return { error: null, user: resp }
-					})
+					return {
+						error: null,
+						user: userToSave
+					}
 				} else return {error: 'Could not create user', user: null};
 			})
 			.catch((error) => {
