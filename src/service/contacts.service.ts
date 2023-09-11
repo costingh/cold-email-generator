@@ -14,6 +14,12 @@ class ContactsService {
             .then((response) => callback(null, response?.data))
             .catch((error) => callback(error, null));
     }
+
+    deleteContact = (contactId: string, callback: (error: any | null, data: string | null) => void) => {
+        api.delete(`/api/contacts/delete-contact?contactId=${contactId}`)
+            .then(() => callback(null, 'Contact successfully deleted'))
+            .catch((error) => callback(error, null));
+    }
 }
 
 export default new ContactsService();

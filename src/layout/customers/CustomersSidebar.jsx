@@ -1,16 +1,26 @@
 import React, { useEffect, useState } from "react";
-import { useRouter } from 'next/router';
-import segmentsService from "@services/segments.service";
-import Icon from "@components/Icon";
 
-function CustomersSidebar({handleOpenCreateContactModal, segments, handleOpenCreateSegmentModal }) {
+import Icon from "@components/Icon";
+import { useRouter } from 'next/router';
+import { useDispatch, useSelector } from "react-redux";
+import segmentsService from "@services/segments.service";
+import { selectSegmentsState, setSegmentsState } from "@store/segmentsSlice";
+import { selectContactsState, setContactsState } from "@store/contactsSlice";
+
+function CustomersSidebar({handleOpenCreateContactModal, handleOpenCreateSegmentModal }) {
     const router = useRouter();
     const [lists, setLists] = useState([])
     const [isSegmentsMenuOpened, setIsSegmentsMenuOpened] = useState(false)
     const [isListsMenuOpened, setIsListsMenuOpened] = useState(false)
 
+    const contactsList = useSelector(selectContactsState);
+	const segmentsList = useSelector(selectSegmentsState);
+
     const openSubMenu = param => {
-        param === 'segments' && setIsSegmentsMenuOpened(!isSegmentsMenuOpened)
+        if(param === 'segments') {
+            setIsSegmentsMenuOpened(!isSegmentsMenuOpened)
+            
+        }
         param === 'lists' && setIsListsMenuOpened(!isListsMenuOpened)
     }
 
@@ -75,7 +85,7 @@ function CustomersSidebar({handleOpenCreateContactModal, segments, handleOpenCre
                         <div className="text ml-2">Segments</div>
                     </div>
                     <div className={`right ${isSegmentsMenuOpened && 'opened'}`}>
-                        <span>{segments?.length}</span>
+                        <span>{segmentsList?.length}</span>
                         <svg
                             className="ml-1 h-16 w-16"
                             xmlns="http://www.w3.org/2000/svg"
@@ -228,14 +238,14 @@ function CustomersSidebar({handleOpenCreateContactModal, segments, handleOpenCre
 
                     <div className="sidebar-title mt-2">Segments of contacts</div>
 
-                    {segments.map(seg =>
+                    {segmentsList.map(seg =>
                         <div key={seg.id} className="submenu-item" onClick={() => navigateTo(seg.name)}>
                             <div className={`check ${router.query.segment === seg.name && 'active'}`}></div>
                             <p>{seg.name}</p>
                         </div>)
                     }
 
-                    {segments.length == 0 &&
+                    {segmentsList.length == 0 &&
                         <p style={{paddingLeft: '10px', fontSize: '14px'}}>No segments available</p>
                     }
 

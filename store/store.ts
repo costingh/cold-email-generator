@@ -1,6 +1,7 @@
 import { configureStore, ThunkAction, Action } from "@reduxjs/toolkit";
 import { authSlice } from "./authSlice";
 import { contactsSlice } from "./contactsSlice";
+import { segmentsSlice } from "./segmentsSlice";
 
 import { createWrapper } from "next-redux-wrapper";
 
@@ -9,6 +10,7 @@ const makeStore = () =>
         reducer: {
             [authSlice.name]: authSlice.reducer,
             [contactsSlice.name]: contactsSlice.reducer,
+            [segmentsSlice.name]: segmentsSlice.reducer,
         },
         devTools: true,
     });

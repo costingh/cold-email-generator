@@ -1,18 +1,19 @@
-import React, { useEffect, useState } from 'react'
-import Navbar from '@components/Navbar'
-import Sidebar from '@components/Sidebar'
-import { useRouter } from 'next/router';
-import DashboardContent from '/src/content/dashboard_content/DashboardContent'
-import ContactsService from '@services/contacts.service';
-import { paginate } from '@lib/paginate';
-import segmentsService from '@services/segments.service';
-import useAuth from "/src/hook/auth";
-import async from "async"
-import campaignService from '@services/campaign.service';
+import React, { useEffect, useState } from 'react';
 
-// redux
-import { selectContactsState, setContactsState } from "@store/contactsSlice";
+import async from "async";
+import Navbar from '@components/Navbar';
+import { useRouter } from 'next/router';
+import { paginate } from '@lib/paginate';
+import Sidebar from '@components/Sidebar';
 import { useDispatch, useSelector } from "react-redux";
+import ContactsService from '@services/contacts.service';
+import segmentsService from '@services/segments.service';
+import campaignService from '@services/campaign.service';
+import { selectSegmentsState, setSegmentsState } from "@store/segmentsSlice";
+import { selectContactsState, setContactsState } from "@store/contactsSlice";
+
+import useAuth from "/src/hook/auth";
+import DashboardContent from '/src/content/dashboard_content/DashboardContent';
 
 const _MOCK_CONTACTS = [
 	{
@@ -52,7 +53,6 @@ export default function Dashboard() {
 	const { view, segment } = router.query;
 	const { user } = useAuth();
 
-	const [segments, setSegments] = useState([])
 	const [contactsData, setContactsData] = useState([]);
 	const [currentPage, setCurrentPage] = useState(1);
 	const pageSize = 6;
@@ -63,8 +63,10 @@ export default function Dashboard() {
 	const [activeCampaigns, setActiveCampaigns] = useState([])
 	const [draftCampaigns, setDraftCampaigns] = useState([])
 
-	const contactsSlice = useSelector(selectContactsState);
-    const dispatch = useDispatch();
+	const contactsList = useSelector(selectContactsState);
+	const segmentsList = useSelector(selectSegmentsState);
+
+	const dispatch = useDispatch();
 
 	const onPageChange = (page) => {
 		setCurrentPage(page);
@@ -73,48 +75,54 @@ export default function Dashboard() {
 	const [loading, setLoading] = useState(false)
 
 	useEffect(() => {
-		if (view == 'contacts' && !router?.query?.segment) {
-			setLoading(true)
-			ContactsService.getContacts(user?.email, (error, contacts) => {
-				// setContactsData(contacts)
-				dispatch(setContactsState(contacts))
-				setLoading(false)
-			})
-			segmentsService.getSegments(user?.email, (error, segments) => {
-				setSegments(segments)
-			})
-		}
-
-		if (view == 'campaigns') {
-			setLoading(true)
-			campaignService.getCampaigns((error, campaigns) => {
-				console.log(campaigns)
-				setLoading(false)
-			})
-		}
-
+		setLoading(true)
+		init(view, () => setLoading(false))
 	}, [router.query])
 
-
-	useEffect(() => {
-		let currentSegment = segments.find(seg => seg.name === segment);
-		if (currentSegment) {
-			segmentsService.getContactsFromSegment(currentSegment.id, (error, contacts) => {
-				setContactsData(contacts)
+	const init = (appview, callback) => {
+		if (appview == 'contacts' && !router?.query?.segment) {
+			async.parallel(
+				{
+					contacts: (cb) => fetchContacts(cb),
+					segments: cb => fetchSegments(cb),
+				},
+				() => {
+					callback()
+				}
+			);
+		} else if (appview == 'campaigns') {
+			campaignService.getCampaigns((error, campaigns) => {
+				callback()
 			})
-		}
-	}, [router.query, segments])
-
-	const addNewContact = (newContactData) => {
-		setContactsData(contactsData => [...contactsData, newContactData])
+		} else if (appview == 'contacts' && router?.query?.segment) {
+			async.parallel(
+				{
+					contacts: (cb) => fetchContacts(cb),
+					segments: cb => fetchSegments(cb),
+				},
+				() => {
+					callback()
+				}
+			);
+		} else callback()
 	}
 
-	const addNewSegment = (newSegmentData) => {
-		setSegments(segmentsData => [...segmentsData, newSegmentData])
+	const fetchContacts = (callback) => {
+		ContactsService.getContacts(user?.email, (error, contacts) => {
+			dispatch(setContactsState(contacts))
+			callback(error, contacts)
+		})
+	}
+
+	const fetchSegments = (callback) => {
+		segmentsService.getSegments(user?.email, (error, segments) => {
+			dispatch(setSegmentsState(segments || []))
+			callback(error, segments)
+		})
 	}
 
 	const handleSaveContacts = (contacts) => {
-		setContactsData(contactsData => [...contactsData, ...contacts])
+		// setContactsData(contactsData => [...contactsData, ...contacts])
 		setImportingContacts(true)
 
 		// save contacts to db
@@ -137,10 +145,6 @@ export default function Dashboard() {
 			<Navbar />
 			<div className='inner-content'>
 				<Sidebar
-					setContactsData={setContactsData}
-					addNewContact={addNewContact}
-					segments={segments}
-					addNewSegment={addNewSegment}
 					handleSaveContacts={handleSaveContacts}
 					isCreateCustomerModalOpened={isCreateCustomerModalOpened}
 					isCreateSegmentModalOpened={isCreateSegmentModalOpened}
@@ -153,12 +157,9 @@ export default function Dashboard() {
 				/>
 				<DashboardContent
 					loadingContacts={loading}
-					setContactsData={setContactsData}
-					items={contactsData.length}
 					currentPage={currentPage}
 					pageSize={pageSize}
 					onPageChange={onPageChange}
-					segments={segments}
 				/>
 			</div>
 		</div>

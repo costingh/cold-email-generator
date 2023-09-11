@@ -81,6 +81,7 @@ function ImportContact({
             setProcessedContacts(contacts)
         }
     }, [importedContacts])
+    
     return (
         <>
             <div id="right-sidebar-modal">

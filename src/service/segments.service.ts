@@ -1,8 +1,7 @@
 import { SegmentInterface } from "@interfaces/Segment.interface";
 import api from "@services/ApiService/api";
-
 class SegmentsService {
-    getSegments = (userEmail : string, callback: any) => {
+    getSegments = (userEmail: string, callback: any) => {
         const queryParams = userEmail ? `?userEmail=${encodeURIComponent(userEmail)}` : '';
         api.get(`/api/segments/${queryParams}`)
             .then((response) => callback(response?.data?.error || null, response?.data?.segments || []))
@@ -15,20 +14,35 @@ class SegmentsService {
             .catch((error) => callback(error, null));
     }
 
-    getContactsFromSegment = (segmentId : string, callback: any) => {
-        const queryParams = segmentId ? `?segmentId=${encodeURIComponent(segmentId)}` : '';
-        api.get(`/api/segments/${queryParams}`)
+    getContactsFromSegment = (segment: any, callback: any) => {
+        let queryParams = '';
+        if (segment?.industry) queryParams += `?industry=${encodeURIComponent(segment?.industry)}`;
+        if (segment?.location) queryParams += `?location=${encodeURIComponent(segment?.location)}`;
+        if (segment?.jobTitle) queryParams += `?jobTitle=${encodeURIComponent(segment?.jobTitle)}`;
+        if (segment?.biography) queryParams += `?biography=${encodeURIComponent(segment?.biography)}`;
+        if (segment?.education) queryParams += `?education=${encodeURIComponent(segment?.education)}`;
+        if (segment?.interests) queryParams += `?interests=${encodeURIComponent(segment?.interests)}`;
+
+        api.get(`/api/segments/get-contacts-from-segment/${queryParams}`)
             .then((response) => callback(response?.data?.error || null, response?.data?.segments || []))
             .catch((error) => callback(error, []));
     }
 
-    countContactsFromSegment = (segmentId : string, callback: any) => {
+    countContactsFromSegment = (segmentId: string, callback: any) => {
         const queryParams = segmentId ? `?count=true?segmentId=${encodeURIComponent(segmentId)}` : '';
         api.get(`/api/segments/${queryParams}`)
             .then((response) => callback(response?.data?.error || null, response?.data?.count || 0))
             .catch((error) => callback(error, []));
     }
-    
+
+    deleteSegment = (segmentId: string, callback: (error: any | null, data: string | null) => void) => {
+        api.delete(`/api/segments/delete-segment?segmentId=${segmentId}`)
+            .then(() => {
+                callback(null, 'Segment deleted successfully!')
+            })
+            .catch((error) => callback(error, null));
+    }
+
 }
 
 export default new SegmentsService();

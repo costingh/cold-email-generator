@@ -1,10 +1,11 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { AppState } from "./store";
 import { HYDRATE } from "next-redux-wrapper";
+import { ContactInterface } from "../src/interfaces/Contact.interface";
 
 // Type for our state
 export interface ContactsState {
-    contactsState: [];
+    contactsState: ContactInterface[];
 }
 
 // Initial state
@@ -21,6 +22,14 @@ export const contactsSlice = createSlice({
         setContactsState(state, action) {
             state.contactsState = action.payload;
         },
+        addNewContact: (state, action) => {
+            let newContact = action.payload;
+            state.contactsState = [...state.contactsState, newContact]
+        },
+        removeContact: (state, action) => {
+            let _removeContact = action.payload;
+            state.contactsState = state.contactsState.filter(contact => contact.id != _removeContact.id)
+        },
     },
 
     // Special reducer for hydrating the state. Special case for next-redux-wrapper
@@ -34,7 +43,7 @@ export const contactsSlice = createSlice({
     },
 });
 
-export const { setContactsState } = contactsSlice.actions;
+export const { setContactsState, addNewContact, removeContact } = contactsSlice.actions;
 
 export const selectContactsState = (state: AppState) => state.contacts.contactsState;
 

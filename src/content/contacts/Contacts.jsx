@@ -1,55 +1,147 @@
-import Pagination from '@components/Pagination'
-import SkeletonLoading from '@components/SkeletonLoading'
-import { paginate } from '@lib/paginate';
-import React, { useEffect, useState } from 'react'
-import { useRouter } from 'next/router';
-import moment from 'moment'
+import React, { useEffect, useState } from 'react';
 
-import { selectContactsState, setContactsState } from "@store/contactsSlice";
+import moment from 'moment';
+import Icon from '@components/Icon';
+import { useRouter } from 'next/router';
+import { paginate } from '@lib/paginate';
+import Pagination from '@components/Pagination';
 import { useDispatch, useSelector } from "react-redux";
+import segmentsService from '@services/segments.service';
+import contactsService from '@services/contacts.service';
+import SkeletonLoading from '@components/SkeletonLoading';
+import ConfirmationModal from '@components/modals/ConfirmationModal';
+import { selectContactsState, setContactsState, removeContact } from "@store/contactsSlice";
+import { selectSegmentsState, selectCurrentSegment, setSegmentsState, setCurrentSegment, removeSegment } from "@store/segmentsSlice";
 
 function Contacts({
     loadingContacts,
-    items,
     currentPage,
     pageSize,
-    onPageChange,
-    segments
+    onPageChange
 }) {
     const router = useRouter();
     const { view, segment } = router.query;
-
-    const [paginatedData, setPaginatedData] = useState([])
-    const [currentSegment, setCurrentSegment] = useState(null)
-
-    useEffect(() => {
-        setCurrentSegment(segments.find(seg => seg.name === segment) || null)
-        console.log(segments.find(seg => seg.name === segment))
-
-        
-		dispatch(setContactsState([]))
-    }, [segment])
-
-    const contactsSlice = useSelector(selectContactsState);
     const dispatch = useDispatch();
 
+    const [paginatedData, setPaginatedData] = useState([])
+    // const [currentSegment, setCurrentSegment] = useState(null)
+    const [isFocusedContactId, setIsFocusedContactId] = useState(null)
+    const [confirmDeleteModal, setConfirmDeleteModal] = useState('');
+    const [currentContact, setCurrentContact] = useState(null)
+
+    const contactsList = useSelector(selectContactsState);
+    const segmentsList = useSelector(selectSegmentsState);
+    const currentSegment = useSelector(selectCurrentSegment);
+
     useEffect(() => {
-        const paginatedContacts = paginate(contactsSlice, currentPage, pageSize);
+        let _segment = segmentsList.find(seg => seg.name === segment) || null
+        dispatch(setCurrentSegment(_segment));
+
+        if (_segment) {
+            segmentsService.getContactsFromSegment(_segment, (err, contacts) => {
+                dispatch(setContactsState(contacts || []))
+            })
+        } else {
+            // let _segment = segmentsList[segmentsList?.length - 1] || null;
+            // setCurrentSegment(_segment)
+            // if (_segment) {
+            //     const currentQuery = { ...router.query };
+            //     currentQuery.segment = _segment.name;
+            //     router.push({
+            //         pathname: router.pathname, // keep the same URL path
+            //         query: currentQuery, // update the query parameters
+            //     });
+            //     segmentsService.getContactsFromSegment(_segment, (err, contacts) => {
+            //         dispatch(setContactsState(contacts || []))
+            //     })
+            // }
+        }
+    }, [segment])
+
+    useEffect(() => {
+        const paginatedContacts = paginate(contactsList, currentPage, pageSize);
         setPaginatedData(paginatedContacts)
-    }, [contactsSlice, currentPage, pageSize])
+    }, [contactsList, currentPage, pageSize])
 
-    // useEffect(() => {
-    //     const paginatedContacts = paginate(contactsData, currentPage, pageSize);
-    //     setPaginatedData(paginatedContacts)
-    // }, [contactsData, currentPage, pageSize])
+    const handleDeleteSegment = () => {
+        setConfirmDeleteModal('segment_delete')
+    }
 
-    // dispatch(setContactsState(contacts))
+    const closeModal = () => {
+        setConfirmDeleteModal('')
+        setCurrentContact(null)
+    }
 
+    const confirmDelete = (payload) => {
+        if (payload == 'segment') {
+
+            if (!currentSegment) {
+                alert('Error in deciding which segment to delete. Please refresh your page')
+            } else {
+                segmentsService.deleteSegment(currentSegment.id, (err, res) => {
+                    if (res) {
+                        dispatch(removeSegment(currentSegment));
+                        setConfirmDeleteModal('')
+                    }
+                })
+            }
+        } else if (payload == 'contact') {
+            if (!currentContact) {
+                alert('Error in deciding which contact to delete. Please refresh your page')
+            } else {
+                contactsService.deleteContact(currentContact.id, (err, res) => {
+                    if (res) {
+                        dispatch(removeContact(currentContact));
+                        setConfirmDeleteModal('')
+                        setCurrentContact(null)
+                    }
+                })
+            }
+        }
+    }
+
+    useEffect(() => {
+        if (currentSegment) {
+            const currentQuery = { ...router.query };
+            currentQuery.segment = currentSegment.name;
+            router.push({
+                pathname: router.pathname, // keep the same URL path
+                query: currentQuery, // update the query parameters
+            });
+        }
+    }, [currentSegment])
+    const handleDeleteContact = (contact) => {
+        setCurrentContact(contact)
+        setConfirmDeleteModal('contact_delete')
+    }
     return (
         <>
             <div className='d-flex align-items-center space-between mt-3'>
+
+                {confirmDeleteModal == 'segment_delete' &&
+                    <ConfirmationModal
+                        close={closeModal}
+                        confirmAction={(e) => confirmDelete('segment')}
+                        title='Are you sure you want to delete this segment?'
+                        description='Once deleted, a segment cannot be recovered, so be careful.'
+                    />
+                }
+
+                {confirmDeleteModal == 'contact_delete' &&
+                    <ConfirmationModal
+                        close={closeModal}
+                        confirmAction={(e) => confirmDelete('contact')}
+                        title='Are you sure you want to delete this contact?'
+                        description='Once deleted, a contact cannot be recovered, so be careful with this action.'
+                    />
+                }
                 <div style={{ display: 'block' }}>
-                    <h2>{!currentSegment ? 'All contacts' : 'Segment - ' + currentSegment.name}</h2>
+                    <div className="d-flex align-items-center">
+                        <h2>{!currentSegment ? 'All contacts' : 'Segment - ' + currentSegment.name}</h2>
+                        <div style={{ marginLeft: '20px', transform: 'scale(1.2)', cursor: 'pointer' }} onClick={handleDeleteSegment}>
+                            <Icon icon='trash' />
+                        </div>
+                    </div>
                     {currentSegment && <span className='muted-text'>{currentSegment.description}</span>}
                 </div>
                 <div className="right-wrapper">
@@ -134,21 +226,26 @@ function Contacts({
                 </div>
 
                 {!loadingContacts && paginatedData.length == 0 && <div className='no-contacts'>Cannot found any contacts matching this criteria</div>}
-                {!loadingContacts && paginatedData.map((customer, idx) => (
-                    <div className='table-row' key={idx}>
+                {!loadingContacts && paginatedData.map((contact, idx) => (
+                    <div className='table-row' key={idx} onMouseEnter={(e) => setIsFocusedContactId(contact.id)} onMouseLeave={(e) => setIsFocusedContactId(null)}>
                         <div className='stacked'>
-                            <span>{customer.name}</span>
-                            <span><svg viewBox="0 0 24 24" width='14px' fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" strokeLinejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M4 7.00005L10.2 11.65C11.2667 12.45 12.7333 12.45 13.8 11.65L20 7" stroke="#808080" stroke-width="2" stroke-linecap="round" strokeLinejoin="round"></path> <rect x="3" y="5" width="18" height="14" rx="2" stroke="#808080" stroke-width="2" stroke-linecap="round"></rect> </g></svg>{customer.email}</span>
+                            <div className="d-flex align-items-center space-between" style={{ paddingRight: '15px' }}>
+                                <span>{contact.name}</span>
+                                <span style={{ display: isFocusedContactId == contact.id ? 'block' : 'none', cursor: 'pointer' }} onClick={(e) => handleDeleteContact(contact)}>
+                                    <Icon icon='trash' />
+                                </span>
+                            </div>
+                            <span><svg viewBox="0 0 24 24" width='14px' fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" strokeLinejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M4 7.00005L10.2 11.65C11.2667 12.45 12.7333 12.45 13.8 11.65L20 7" stroke="#808080" stroke-width="2" stroke-linecap="round" strokeLinejoin="round"></path> <rect x="3" y="5" width="18" height="14" rx="2" stroke="#808080" stroke-width="2" stroke-linecap="round"></rect> </g></svg>{contact.email}</span>
                         </div>
 
                         <div className='stacked'>
-                            <span>{customer.job_title}</span>
-                            <span><svg viewBox="0 0 24 24" width='14px' fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#808080"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" strokeLinejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M9 7H5C3.89543 7 3 7.89543 3 9V18C3 19.1046 3.89543 20 5 20H19C20.1046 20 21 19.1046 21 18V9C21 7.89543 20.1046 7 19 7H15M9 7V5C9 3.89543 9.89543 3 11 3H13C14.1046 3 15 3.89543 15 5V7M9 7H15" stroke="#808080" stroke-width="2" stroke-linecap="round" strokeLinejoin="round"></path> </g></svg>{customer.company}</span>
+                            <span>{contact.job_title}</span>
+                            <span><svg viewBox="0 0 24 24" width='14px' fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#808080"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" strokeLinejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M9 7H5C3.89543 7 3 7.89543 3 9V18C3 19.1046 3.89543 20 5 20H19C20.1046 20 21 19.1046 21 18V9C21 7.89543 20.1046 7 19 7H15M9 7V5C9 3.89543 9.89543 3 11 3H13C14.1046 3 15 3.89543 15 5V7M9 7H15" stroke="#808080" stroke-width="2" stroke-linecap="round" strokeLinejoin="round"></path> </g></svg>{contact.company}</span>
                         </div>
                         {/* <div>Social Media</div> */}
-                        <div>{customer.location}</div>
-                        <div className='bibliography'>{customer.biography}</div>
-                        <div>{customer.education}</div>
+                        <div>{contact.location}</div>
+                        <div className='bibliography'>{contact.biography}</div>
+                        <div>{contact.education}</div>
                         <div>Links</div>
                         {/* <div>Interests</div> */}
                     </div>
@@ -158,7 +255,7 @@ function Contacts({
             {loadingContacts && pageSize && new Array(pageSize).fill(0).map((_item, index) => <div key={index} className='mt-4 border-radius-2 overflow-hidden'><SkeletonLoading /></div>)}
 
             <Pagination
-                items={items}
+                items={contactsList?.length || 0}
                 currentPage={currentPage}
                 pageSize={pageSize}
                 onPageChange={onPageChange}
