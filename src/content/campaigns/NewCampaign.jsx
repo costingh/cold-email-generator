@@ -189,6 +189,7 @@ function NewCampaign() {
                     setEmailSubject={setEmailSubject}
                     emailBody={emailBody}
                     setEmailBody={setEmailBody}
+                    campaignSegments={campaignSegments}
                 />
             }
 

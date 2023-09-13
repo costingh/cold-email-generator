@@ -34,29 +34,15 @@ function Contacts({
     const currentSegment = useSelector(selectCurrentSegment);
 
     useEffect(() => {
-        let _segment = segmentsList.find(seg => seg.name === segment) || null
+        let _segment = segmentsList.find(seg => seg.name === segment) || null;
         dispatch(setCurrentSegment(_segment));
 
-        if (_segment) {
-            segmentsService.getContactsFromSegment(_segment, (err, contacts) => {
-                dispatch(setContactsState(contacts || []))
-            })
-        } else {
-            // let _segment = segmentsList[segmentsList?.length - 1] || null;
-            // setCurrentSegment(_segment)
-            // if (_segment) {
-            //     const currentQuery = { ...router.query };
-            //     currentQuery.segment = _segment.name;
-            //     router.push({
-            //         pathname: router.pathname, // keep the same URL path
-            //         query: currentQuery, // update the query parameters
-            //     });
-            //     segmentsService.getContactsFromSegment(_segment, (err, contacts) => {
-            //         dispatch(setContactsState(contacts || []))
-            //     })
-            // }
-        }
-    }, [segment])
+        // if (_segment) {
+        //     segmentsService.getContactsFromSegment(_segment, (err, contacts) => {
+        //         dispatch(setContactsState(contacts))
+        //     })
+        // } 
+    }, [router])
 
     useEffect(() => {
         const paginatedContacts = paginate(contactsList, currentPage, pageSize);
@@ -110,6 +96,7 @@ function Contacts({
             });
         }
     }, [currentSegment])
+
     const handleDeleteContact = (contact) => {
         setCurrentContact(contact)
         setConfirmDeleteModal('contact_delete')
@@ -137,10 +124,10 @@ function Contacts({
                 }
                 <div style={{ display: 'block' }}>
                     <div className="d-flex align-items-center">
-                        <h2>{!currentSegment ? 'All contacts' : 'Segment - ' + currentSegment.name}</h2>
-                        <div style={{ marginLeft: '20px', transform: 'scale(1.2)', cursor: 'pointer' }} onClick={handleDeleteSegment}>
+                        <h2>{!currentSegment ? 'All contacts' : 'Segment - ' + currentSegment?.name}</h2>
+                        {currentSegment && <div style={{ marginLeft: '20px', transform: 'scale(1.2)', cursor: 'pointer' }} onClick={handleDeleteSegment}>
                             <Icon icon='trash' />
-                        </div>
+                        </div>}
                     </div>
                     {currentSegment && <span className='muted-text'>{currentSegment.description}</span>}
                 </div>

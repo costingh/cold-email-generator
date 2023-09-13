@@ -1,9 +1,9 @@
 import fs from 'fs';
 import csvParser from 'csv-parser';
 
-async function readCSVFile(filePath) {
+async function readCSVFile(filePath : string) {
     return new Promise((resolve, reject) => {
-        const results = [];
+        const results : any = [];
 
         fs.createReadStream(filePath)
             .pipe(csvParser())
@@ -19,11 +19,11 @@ async function readCSVFile(filePath) {
     });
 }
 
-export async function importContactsFromCSV(filePath) {
+export async function importContactsFromCSV(filePath : string) {
 
     try {
-        const csvData = await readCSVFile(filePath);
-        const contacts = csvData.map((rowData) => ({
+        const csvData : any = await readCSVFile(filePath);
+        const contacts = csvData.map((rowData: any) => ({
             name: rowData.Name,
             email: rowData.Email,
             phoneNumber: rowData['Phone Number'],

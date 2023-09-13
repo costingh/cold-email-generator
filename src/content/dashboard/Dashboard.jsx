@@ -9,8 +9,8 @@ import { useDispatch, useSelector } from "react-redux";
 import ContactsService from '@services/contacts.service';
 import segmentsService from '@services/segments.service';
 import campaignService from '@services/campaign.service';
-import { selectSegmentsState, setSegmentsState } from "@store/segmentsSlice";
 import { selectContactsState, setContactsState } from "@store/contactsSlice";
+import { selectSegmentsState, selectCurrentSegment, setSegmentsState, setCurrentSegment, removeSegment } from "@store/segmentsSlice";
 
 import useAuth from "/src/hook/auth";
 import DashboardContent from '/src/content/dashboard_content/DashboardContent';
@@ -65,6 +65,7 @@ export default function Dashboard() {
 
 	const contactsList = useSelector(selectContactsState);
 	const segmentsList = useSelector(selectSegmentsState);
+	const currentSegment = useSelector(selectCurrentSegment);
 
 	const dispatch = useDispatch();
 
@@ -77,7 +78,7 @@ export default function Dashboard() {
 	useEffect(() => {
 		setLoading(true)
 		init(view, () => setLoading(false))
-	}, [router.query])
+	}, [router.query, currentSegment])
 
 	const init = (appview, callback) => {
 		if (appview == 'contacts' && !router?.query?.segment) {
@@ -108,9 +109,9 @@ export default function Dashboard() {
 	}
 
 	const fetchContacts = (callback) => {
-		ContactsService.getContacts(user?.email, (error, contacts) => {
+		segmentsService.getContactsFromSegment(currentSegment, user?.email, (err, contacts) => {
 			dispatch(setContactsState(contacts))
-			callback(error, contacts)
+			callback(err, contacts)
 		})
 	}
 
@@ -122,7 +123,6 @@ export default function Dashboard() {
 	}
 
 	const handleSaveContacts = (contacts) => {
-		// setContactsData(contactsData => [...contactsData, ...contacts])
 		setImportingContacts(true)
 
 		// save contacts to db

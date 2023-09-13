@@ -14,17 +14,20 @@ class SegmentsService {
             .catch((error) => callback(error, null));
     }
 
-    getContactsFromSegment = (segment: any, callback: any) => {
-        let queryParams = '';
-        if (segment?.industry) queryParams += `?industry=${encodeURIComponent(segment?.industry)}`;
-        if (segment?.location) queryParams += `?location=${encodeURIComponent(segment?.location)}`;
-        if (segment?.jobTitle) queryParams += `?jobTitle=${encodeURIComponent(segment?.jobTitle)}`;
-        if (segment?.biography) queryParams += `?biography=${encodeURIComponent(segment?.biography)}`;
-        if (segment?.education) queryParams += `?education=${encodeURIComponent(segment?.education)}`;
-        if (segment?.interests) queryParams += `?interests=${encodeURIComponent(segment?.interests)}`;
+    getContactsFromSegment = (segment: any, userEmail: string, callback: any) => {
+        let queryParams = `?userEmail=${userEmail}`;
+        if (segment?.industry) queryParams += `&industry=${encodeURIComponent(segment?.industry)}`;
+        if (segment?.location) queryParams += `&location=${encodeURIComponent(segment?.location)}`;
+        if (segment?.jobTitle) queryParams += `&jobTitle=${encodeURIComponent(segment?.jobTitle)}`;
+        if (segment?.biography) queryParams += `&biography=${encodeURIComponent(segment?.biography)}`;
+        if (segment?.education) queryParams += `&education=${encodeURIComponent(segment?.education)}`;
+        if (segment?.interests) queryParams += `&interests=${encodeURIComponent(segment?.interests)}`;
 
         api.get(`/api/segments/get-contacts-from-segment/${queryParams}`)
-            .then((response) => callback(response?.data?.error || null, response?.data?.segments || []))
+            .then((response) => {
+                console.log(response)
+                callback(response?.data?.error || null, response?.data?.contacts || [])
+            })
             .catch((error) => callback(error, []));
     }
 

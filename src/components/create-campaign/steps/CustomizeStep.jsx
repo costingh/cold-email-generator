@@ -1,8 +1,9 @@
-import EmailFormatter from '@components/EmailFormatter'
-import Icon from '@components/Icon'
-import React, { useState } from 'react'
-import OpenAI from '@services/openai.service'
-import PreviewEmail from '@components/modals/PreviewEmail'
+import React, { useEffect, useState } from 'react';
+
+import Icon from '@components/Icon';
+import OpenAI from '@services/openai.service';
+import EmailFormatter from '@components/EmailFormatter';
+import PreviewEmail from '@components/modals/PreviewEmail';
 
 function CustomizeStep({
     setShowPromptsSuggestion,
@@ -16,7 +17,10 @@ function CustomizeStep({
     setEmailSubject,
     emailBody,
     setEmailBody,
+    campaignSegments
 }) {
+
+    const [contactsNumber, setContactsNumber] = useState(0)
 
     const handlePreviewEmail = async () => {
         let response = {
@@ -56,6 +60,10 @@ function CustomizeStep({
         setShow(true)
     }
 
+    useEffect(() => {
+        setContactsNumber(campaignSegments.reduce((acc, curr) => acc + curr.contacts_count, 0))
+    }, [campaignSegments])
+
     return (
         <div className='create-campaign-wrapper'>
             <PreviewEmail show={show} closeModal={closeModal} emailSubject={emailSubject} emailBody={emailBody} />
@@ -83,7 +91,7 @@ function CustomizeStep({
                             </div>
 
                             <div className="d-flex align-items-center" style={{ columnGap: '20px' }}>
-                                <div className='btn-outline'>18 emails</div>
+                                <div className='btn-outline'>{contactsNumber | 0} emails</div>
                                 <div className='preview-btn d-flex align-items-center' onClick={handlePreviewEmail}>
                                     <Icon icon='eye' />
                                     <p>Preview Email</p>

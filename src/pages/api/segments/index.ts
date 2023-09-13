@@ -1,7 +1,7 @@
 import { prisma } from "@lib/prisma";
 import { SegmentInterface } from "@interfaces/Segment.interface";
 
-export default async function handler(req: { method: string; query: { userEmail: string, segmentId: any, count: boolean }; body: { segment: any; }; }, res: { send: (arg0: { segments?: any | never[]; count? : number | 0; error: any; response?: any; status?: number; }) => void; }) {
+export default async function handler(req: any, res: any) {
     if (prisma) {
         if (req.method === "GET") {
             let segmentsCount = 0;
@@ -25,9 +25,21 @@ export default async function handler(req: { method: string; query: { userEmail:
                         },
                     });
                 } else if(segmentId && count) {
-                    segmentsCount = await prisma.contactSegment.count({
+                    const industry = req.query.industry || '';
+                    const location = req.query.location || '';
+                    const jobTitle = req.query.jobTitle || '';
+                    const biography = req.query.biography || '';
+                    const education = req.query.education || '';
+                    const interests = decodeURIComponent(req.query.interests).split('+') || [];
+
+                    segmentsCount = await prisma.contact.count({
                         where: {
-                            segmentId: { equals: segmentId },
+                            job_title: { contains: jobTitle },
+                            // industry: { contains: industry },
+                            location: { contains: location },
+                            biography: { contains: biography },
+                            education: { contains: education },
+                            interests: { hasEvery: interests }
                         },
                     });
                 } else {

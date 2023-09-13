@@ -42,7 +42,7 @@ model Segment {
   location        String?
   jobTitle        String?
   engagementLevel String?
-  interests       String[]
+  interests       String?
   user_email      String
   User            User             @relation(fields: [user_email], references: [email])
   campaigns       Campaign[] // A segment can be associated with multiple campaigns
@@ -65,7 +65,7 @@ model Contact {
   User         User             @relation(fields: [user_email], references: [email])
   links        String[]
   social_media String[]
-  interests    String[]
+  interests    String?
   createdAt    DateTime         @default(now())
   updatedAt    DateTime         @updatedAt
   segments     ContactSegment[]

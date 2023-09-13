@@ -75,9 +75,9 @@ function Sidebar({
 		location: '',
 		education: '',
 		biography: '',
-		links: [],
-		interests: [],
-		social_media: [],
+		links: '',
+		interests: '',
+		social_media: '',
 		// segments: [],
 		user_email: user?.email
 	})
@@ -88,7 +88,7 @@ function Sidebar({
 		industry: '',
 		location: '',
 		jobTitle: '',
-		interests: [],
+		interests: '',
 		user_email: user?.email
 	});
 
@@ -143,7 +143,7 @@ function Sidebar({
 				setSegmentData({ ...segmentData, jobTitle: e.target.value })
 				break;
 			case 'segment_criteria_interests':
-				setSegmentData({ ...segmentData, interests: [e.target.value] })
+				setSegmentData({ ...segmentData, interests: e.target.value })
 				break;
 
 
@@ -156,6 +156,7 @@ function Sidebar({
 	const createSegment = () => {
 		setCreatingSegment(true)
 		segmentsService.createSegment(segmentData, (error, res) => {
+			console.log(res)
 			if (error || res?.error) {
 				setCreatingSegment(false)
 				setMessage({
@@ -187,6 +188,20 @@ function Sidebar({
 
 	const addContact = () => {
 		setAddingContact(true)
+		
+		// let newContactData2 = {
+		// 	email: 'mircea',
+		// 	name: 'Mircea',
+		// 	phoneNumber: '07242891024',
+		// 	company: 'ceva',
+		// 	job_title: 'CEO',
+		// 	biography: '-',
+		// 	education: '-',
+		// 	location: 'Europe',
+		// 	interests: ['AI', 'SaaS'],
+		// 	user_email: 'gheorghecostin221@gmail.com'
+		// }
+
 		ContactsService.createContact(newContactData, (error, res) => {
 			console.log(res)
 			if (error || res?.error) {
@@ -250,6 +265,10 @@ function Sidebar({
 				/>
 			}
 			<div className="mini-sidebar">
+				<div className={`mini-sidebar-item ${router?.query?.view == 'dashboard' && 'active'}`} onClick={() => navigateTo('dashboard')}>
+					<Icon icon='home' />
+				</div>
+
 				<div className={`mini-sidebar-item ${router?.query?.view == 'contacts' && 'active'}`} onClick={() => navigateTo('contacts')}>
 					<Icon icon='contacts' />
 				</div>

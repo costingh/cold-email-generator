@@ -6,5 +6,5 @@ export interface SegmentInterface {
     industry?: string;
     location?: string;
     jobTitle?: string;
-    interests: string[];
+    interests: string;
 }

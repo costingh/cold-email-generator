@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "Segment" ALTER COLUMN "interests" DROP NOT NULL,
+ALTER COLUMN "interests" SET DATA TYPE TEXT;
