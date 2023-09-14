@@ -1,5 +1,6 @@
-import Icon from '@components/Icon'
-import React from 'react'
+import React from 'react';
+
+import Icon from '@components/Icon';
 import { useRouter } from 'next/router';
 
 function CampaignsSidebar({ activeCampaigns, draftCampaigns }) {

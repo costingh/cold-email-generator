@@ -5,14 +5,14 @@ import Icon from '@components/Icon';
 import { useRouter } from 'next/router';
 import { paginate } from '@lib/paginate';
 import Pagination from '@components/Pagination';
+import routerService from '@services/router.service';
 import { useDispatch, useSelector } from "react-redux";
 import segmentsService from '@services/segments.service';
 import contactsService from '@services/contacts.service';
 import SkeletonLoading from '@components/SkeletonLoading';
 import ConfirmationModal from '@components/modals/ConfirmationModal';
-import { selectContactsState, setContactsState, removeContact } from "@store/contactsSlice";
-import { selectSegmentsState, selectCurrentSegment, setSegmentsState, setCurrentSegment, removeSegment } from "@store/segmentsSlice";
-import routerService from '@services/router.service';
+import { selectContactsState, removeContact } from "@store/contactsSlice";
+import { selectSegmentsState, selectCurrentSegment, setCurrentSegment, removeSegment } from "@store/segmentsSlice";
 
 function Contacts({
     loadingContacts,
@@ -20,12 +20,12 @@ function Contacts({
     pageSize,
     onPageChange
 }) {
-    const router = useRouter();
-    const { view, segment } = router.query;
     const dispatch = useDispatch();
 
+    const router = useRouter();
+    const { view, segment } = router.query;
+    
     const [paginatedData, setPaginatedData] = useState([])
-    // const [currentSegment, setCurrentSegment] = useState(null)
     const [isFocusedContactId, setIsFocusedContactId] = useState(null)
     const [confirmDeleteModal, setConfirmDeleteModal] = useState('');
     const [currentContact, setCurrentContact] = useState(null)
@@ -83,7 +83,7 @@ function Contacts({
 
     useEffect(() => {
         if (currentSegment) {
-		    routerService.updateUrlParam(router, 'segment', currentSegment.name)
+            routerService.updateUrlParam(router, 'segment', currentSegment.name)
         }
 
     }, [currentSegment])

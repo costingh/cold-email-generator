@@ -1,19 +1,20 @@
-import Icon from '@components/Icon'
-import React from 'react'
-import NewCampaign from './NewCampaign'
+import React from 'react';
+
 import { useRouter } from 'next/router';
 import routerService from '@services/router.service';
+
+import NewCampaign from './NewCampaign';
 
 function Campaigns() {
 	const router = useRouter();
 
 	const goToCreateCampaign = () => {
-        routerService.navigate(router, '/dashboard', { view: 'campaigns', create_campaign: true, step: 'details' }, true)
+		routerService.navigate(router, '/dashboard', { view: 'campaigns', create_campaign: true, step: 'details' }, true)
 	}
 
 	return (
 		<div className='campaigns-page-wrapper'>
-			{router?.query?.create_campaign ? <NewCampaign/> :
+			{router?.query?.create_campaign ? <NewCampaign /> :
 				<div className='inner'>
 					<h1>This is campaigns view</h1>
 					<p>Here you can manage your existing campaigns or create a new one.</p>

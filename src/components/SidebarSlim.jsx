@@ -1,14 +1,16 @@
-import React from 'react'
+import React from 'react';
+
 import { useRouter } from 'next/router';
 import routerService from '@services/router.service';
+
 import Icon from './Icon';
 
 function SidebarSlim() {
-	const router = useRouter();
+    const router = useRouter();
 
-	const navigateTo = route => {
+    const navigateTo = route => {
         routerService.navigate(router, '/dashboard', { view: route }, true)
-	}
+    }
     return (
         <div className="mini-sidebar">
             <div className={`mini-sidebar-item ${router?.query?.view == 'dashboard' && 'active'}`} onClick={() => navigateTo('dashboard')}>

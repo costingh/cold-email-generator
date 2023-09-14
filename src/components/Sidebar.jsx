@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 
 import { useRouter } from 'next/router';
+import routerService from "@services/router.service";
 import { useDispatch, useSelector } from "react-redux";
 import ContactsService from "@services/contacts.service";
 import segmentsService from "@services/segments.service";
@@ -14,11 +15,9 @@ import ConversationsSidebar from '../layout/conversations/ConversationsSidebar';
 import ImportContact from "./modals/ImportContact";
 import CreateSegment from "./modals/CreateSegment";
 
-import Icon from "./Icon";
+import SidebarSlim from "./SidebarSlim";
 
 import useAuth from "/src/hook/auth";
-import routerService from "@services/router.service";
-import SidebarSlim from "./SidebarSlim";
 
 function Sidebar({
 	isCreateCustomerModalOpened,

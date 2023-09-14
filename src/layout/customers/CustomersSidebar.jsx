@@ -1,26 +1,25 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 
 import Icon from "@components/Icon";
 import { useRouter } from 'next/router';
-import { useDispatch, useSelector } from "react-redux";
-import segmentsService from "@services/segments.service";
-import { selectSegmentsState, setSegmentsState } from "@store/segmentsSlice";
-import { selectContactsState, setContactsState } from "@store/contactsSlice";
 import routerService from "@services/router.service";
+import { useSelector } from "react-redux";
+import { selectSegmentsState } from "@store/segmentsSlice";
+import { selectContactsState } from "@store/contactsSlice";
 
-function CustomersSidebar({handleOpenCreateContactModal, handleOpenCreateSegmentModal }) {
+function CustomersSidebar({ handleOpenCreateContactModal, handleOpenCreateSegmentModal }) {
     const router = useRouter();
     const [lists, setLists] = useState([])
     const [isSegmentsMenuOpened, setIsSegmentsMenuOpened] = useState(false)
     const [isListsMenuOpened, setIsListsMenuOpened] = useState(false)
 
     const contactsList = useSelector(selectContactsState);
-	const segmentsList = useSelector(selectSegmentsState);
+    const segmentsList = useSelector(selectSegmentsState);
 
     const openSubMenu = param => {
-        if(param === 'segments') {
+        if (param === 'segments') {
             setIsSegmentsMenuOpened(!isSegmentsMenuOpened)
-            
+
         }
         param === 'lists' && setIsListsMenuOpened(!isListsMenuOpened)
     }
@@ -41,7 +40,7 @@ function CustomersSidebar({handleOpenCreateContactModal, handleOpenCreateSegment
                     <Icon icon='plus' />
                     <span>Add contacts</span>
                 </div>
-                
+
                 <div className="sidebar-title">Filter by contact properties</div>
 
                 <div className="item" onClick={() => openSubMenu('segments')}>
@@ -150,33 +149,33 @@ function CustomersSidebar({handleOpenCreateContactModal, handleOpenCreateSegment
 
             {isSegmentsMenuOpened &&
                 <div className="sidebar-submenu">
-                     <div className="btn-filled text-center max-w-80 mb-4" onClick={handleOpenCreateSegmentModal}>
-                    <svg
-                        width="16"
-                        height="16"
-                        viewBox="0 0 16 16"
-                        fill="none"
-                        stroke="currentColor"
-                        xmlns="http://www.w3.org/2000/svg"
-                    >
-                        <title>plus icon</title>
-                        <path
-                            d="M8 3.33337V12.6667"
-                            strokeWidth="1.6"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                        ></path>
-                        <path
-                            d="M3.3335 8H12.6668"
-                            strokeWidth="1.6"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                        ></path>
-                    </svg>
-                    <span>Create Segment</span>
-                </div>
+                    <div className="btn-filled text-center max-w-80 mb-4" onClick={handleOpenCreateSegmentModal}>
+                        <svg
+                            width="16"
+                            height="16"
+                            viewBox="0 0 16 16"
+                            fill="none"
+                            stroke="currentColor"
+                            xmlns="http://www.w3.org/2000/svg"
+                        >
+                            <title>plus icon</title>
+                            <path
+                                d="M8 3.33337V12.6667"
+                                strokeWidth="1.6"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                            ></path>
+                            <path
+                                d="M3.3335 8H12.6668"
+                                strokeWidth="1.6"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                            ></path>
+                        </svg>
+                        <span>Create Segment</span>
+                    </div>
                     <div className="submenu-header mt-4">
-                        <div className="icon" onClick={() => { openSubMenu('segments'); removeQueryParam('segment');}}>
+                        <div className="icon" onClick={() => { openSubMenu('segments'); removeQueryParam('segment'); }}>
                             <svg
                                 className="ml-1 h-16 w-16"
                                 xmlns="http://www.w3.org/2000/svg"
@@ -240,7 +239,7 @@ function CustomersSidebar({handleOpenCreateContactModal, handleOpenCreateSegment
                     }
 
                     {segmentsList.length == 0 &&
-                        <p style={{paddingLeft: '10px', fontSize: '14px'}}>No segments available</p>
+                        <p style={{ paddingLeft: '10px', fontSize: '14px' }}>No segments available</p>
                     }
 
                 </div>

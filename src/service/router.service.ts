@@ -7,8 +7,8 @@ class RouterService {
             query: currentQuery, // update the query parameters
         });
     }
-    
-    navigate = (router: any, pathname:string, query:string, shallow:boolean) => {
+
+    navigate = (router: any, pathname: string, query: string, shallow: boolean) => {
         router.push(
             {
                 pathname: pathname,

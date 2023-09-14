@@ -1,18 +1,16 @@
-import Icon from '@components/Icon'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react';
+
+import async from 'async';
 import { useRouter } from 'next/router';
+import routerService from '@services/router.service';
 import segmentsService from '@services/segments.service';
-import useAuth from "/src/hook/auth";
-import contactsService from '@services/contacts.service';
-import async from 'async'
-import SkeletonLoading from '@components/SkeletonLoading';
-import EmailFormatter from '@components/EmailFormatter';
-import OverviewStep from '@components/create-campaign/steps/OverviewStep';
 import DetailsStep from '@components/create-campaign/steps/DetailsStep';
-import NavbarProgress from '@components/create-campaign/progress/NavbarProgress';
+import OverviewStep from '@components/create-campaign/steps/OverviewStep';
 import ContactsStep from '@components/create-campaign/steps/ContactsStep';
 import CustomizeStep from '@components/create-campaign/steps/CustomizeStep';
-import routerService from '@services/router.service';
+import NavbarProgress from '@components/create-campaign/progress/NavbarProgress';
+
+import useAuth from "/src/hook/auth";
 
 
 function NewCampaign() {
@@ -27,9 +25,17 @@ function NewCampaign() {
     const [showPromptsSuggestion, setShowPromptsSuggestion] = useState(false)
     const [showCsvVariables, setShowCsvVariables] = useState(false)
     const [error, setError] = useState('')
+
+    const prompts_suggestion = [
+        'Personalized subject', 'Personalized compliment', 'Ask for a reply', 'How your business can help', 'What we do'
+    ]
+
+    const csv_variables = [
+        'Name', 'Email', 'Company', 'Phone Number', 'Job Title', 'Education', 'Interests', 'Social media'
+    ]
     
     const [emailSubject, setEmailSubject] = useState('[[ Personalized email subject about increasing productivity ]]')
-    // const [emailBody, setEmailBody] = useState('')
+
     const [emailBody, setEmailBody] = useState(
         `Hello {{first_name}},
             \n[[Opening: Share a personal anecdote about a common struggle in outreach]]
@@ -74,23 +80,13 @@ function NewCampaign() {
         routerService.navigate(router, '/dashboard', { view: 'campaigns', create_campaign: true, step: _step }, true)
     }
 
-    const prompts_suggestion = [
-        'Personalized subject', 'Personalized compliment', 'Ask for a reply', 'How your business can help', 'What we do'
-    ]
-
-    const csv_variables = [
-        'Name', 'Email', 'Company', 'Phone Number', 'Job Title', 'Education', 'Interests', 'Social media'
-    ]
-
     useEffect(() => {
         setLoadingSegments(true)
         if (router?.query?.step == 'contacts') {
             segmentsService.getSegments(user?.email, (error, segments) => {
                 setSegments(segments)
                 setLoadingSegments(false)
-
                 let _segments = [...segments]
-
                 async.eachLimit(_segments, 5,
                     function (segment, cb) {
                         segmentsService.countContactsFromSegment(segment.id, (error, count) => {
