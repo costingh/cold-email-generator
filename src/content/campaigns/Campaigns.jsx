@@ -2,19 +2,13 @@ import Icon from '@components/Icon'
 import React from 'react'
 import NewCampaign from './NewCampaign'
 import { useRouter } from 'next/router';
+import routerService from '@services/router.service';
 
 function Campaigns() {
 	const router = useRouter();
 
 	const goToCreateCampaign = () => {
-		router.push(
-			{
-				pathname: '/dashboard',
-				query: { view: 'campaigns', create_campaign: true, step: 'details' },
-			},
-			undefined,
-			{ shallow: true }
-		);
+        routerService.navigate(router, '/dashboard', { view: 'campaigns', create_campaign: true, step: 'details' }, true)
 	}
 
 	return (

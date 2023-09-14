@@ -17,6 +17,8 @@ import CreateSegment from "./modals/CreateSegment";
 import Icon from "./Icon";
 
 import useAuth from "/src/hook/auth";
+import routerService from "@services/router.service";
+import SidebarSlim from "./SidebarSlim";
 
 function Sidebar({
 	isCreateCustomerModalOpened,
@@ -41,17 +43,6 @@ function Sidebar({
 		success: '',
 		error: ''
 	})
-
-	const navigateTo = route => {
-		router.push(
-			{
-				pathname: '/dashboard',
-				query: { view: route },
-			},
-			undefined,
-			{ shallow: true }
-		);
-	}
 
 	const handleOpenCreateContactModal = () => {
 		setIsCreateCustomerModalOpened(true)
@@ -156,7 +147,6 @@ function Sidebar({
 	const createSegment = () => {
 		setCreatingSegment(true)
 		segmentsService.createSegment(segmentData, (error, res) => {
-			console.log(res)
 			if (error || res?.error) {
 				setCreatingSegment(false)
 				setMessage({
@@ -173,22 +163,14 @@ function Sidebar({
 					success: 'Segment created successfully'
 				})
 				setIsCreateSegmentModalOpened(false)
-
-				// modify query param from url
-				const currentQuery = { ...router.query };
-				currentQuery.segment = segmentData.name;
-				router.push({
-					pathname: router.pathname, // keep the same URL path
-					query: currentQuery, // update the query parameters
-				});
-
+				routerService.updateUrlParam(router, 'segment', segmentData.name)
 			}
 		})
 	}
 
 	const addContact = () => {
 		setAddingContact(true)
-		
+
 		// let newContactData2 = {
 		// 	email: 'mircea',
 		// 	name: 'Mircea',
@@ -203,7 +185,6 @@ function Sidebar({
 		// }
 
 		ContactsService.createContact(newContactData, (error, res) => {
-			console.log(res)
 			if (error || res?.error) {
 				setAddingContact(false)
 				setMessage({
@@ -226,7 +207,6 @@ function Sidebar({
 	const closeModal = () => {
 		setIsCreateCustomerModalOpened(false)
 		setIsCreateSegmentModalOpened(false)
-
 		resetFormData()
 		let bodyEl = document.querySelector('body');
 		if (bodyEl) bodyEl.style.overflow = 'auto'
@@ -264,29 +244,26 @@ function Sidebar({
 					contactsImported={contactsImported}
 				/>
 			}
-			<div className="mini-sidebar">
-				<div className={`mini-sidebar-item ${router?.query?.view == 'dashboard' && 'active'}`} onClick={() => navigateTo('dashboard')}>
-					<Icon icon='home' />
-				</div>
 
-				<div className={`mini-sidebar-item ${router?.query?.view == 'contacts' && 'active'}`} onClick={() => navigateTo('contacts')}>
-					<Icon icon='contacts' />
-				</div>
+			<SidebarSlim/>
 
-				<div className={`mini-sidebar-item ${router?.query?.view == 'campaigns' && 'active'}`} onClick={() => navigateTo('campaigns')}>
-					<Icon icon='campaigns' />
-				</div>
+			{router?.query?.view == 'contacts' &&
+				<CustomersSidebar
+					handleOpenCreateContactModal={handleOpenCreateContactModal}
+					handleOpenCreateSegmentModal={handleOpenCreateSegmentModal}
+				/>
+			}
 
-				<div className={`mini-sidebar-item ${router?.query?.view == 'conversations' && 'active'}`} onClick={() => navigateTo('conversations')}>
-					<Icon icon='conversations' />
-				</div>
+			{router?.query?.view == 'campaigns' &&
+				<CampaignsSidebar
+					activeCampaigns={activeCampaigns}
+					draftCampaigns={draftCampaigns}
+				/>
+			}
 
-				<div className="section-end"></div>
-			</div>
-
-			{router?.query?.view == 'contacts' && <CustomersSidebar handleOpenCreateContactModal={handleOpenCreateContactModal} handleOpenCreateSegmentModal={handleOpenCreateSegmentModal} />}
-			{router?.query?.view == 'campaigns' && <CampaignsSidebar activeCampaigns={activeCampaigns} draftCampaigns={draftCampaigns} />}
-			{router?.query?.view == 'conversations' && <ConversationsSidebar />}
+			{router?.query?.view == 'conversations' &&
+				<ConversationsSidebar />
+			}
 		</div>
 	);
 }

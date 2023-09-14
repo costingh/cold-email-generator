@@ -12,6 +12,7 @@ import DetailsStep from '@components/create-campaign/steps/DetailsStep';
 import NavbarProgress from '@components/create-campaign/progress/NavbarProgress';
 import ContactsStep from '@components/create-campaign/steps/ContactsStep';
 import CustomizeStep from '@components/create-campaign/steps/CustomizeStep';
+import routerService from '@services/router.service';
 
 
 function NewCampaign() {
@@ -26,7 +27,7 @@ function NewCampaign() {
     const [showPromptsSuggestion, setShowPromptsSuggestion] = useState(false)
     const [showCsvVariables, setShowCsvVariables] = useState(false)
     const [error, setError] = useState('')
-
+    
     const [emailSubject, setEmailSubject] = useState('[[ Personalized email subject about increasing productivity ]]')
     // const [emailBody, setEmailBody] = useState('')
     const [emailBody, setEmailBody] = useState(
@@ -40,14 +41,7 @@ function NewCampaign() {
     const step = router?.query?.step;
 
     const cancelCreateCampaign = () => {
-        router.push(
-            {
-                pathname: '/dashboard',
-                query: { view: 'campaigns' },
-            },
-            undefined,
-            { shallow: true }
-        );
+        routerService.navigate(router, '/dashboard', { view: 'campaigns' }, true)
     }
 
     const goToStep = _step => {
@@ -77,14 +71,7 @@ function NewCampaign() {
             }
         }
 
-        router.push(
-            {
-                pathname: '/dashboard',
-                query: { view: 'campaigns', create_campaign: true, step: _step },
-            },
-            undefined,
-            { shallow: true }
-        );
+        routerService.navigate(router, '/dashboard', { view: 'campaigns', create_campaign: true, step: _step }, true)
     }
 
     const prompts_suggestion = [
@@ -117,19 +104,50 @@ function NewCampaign() {
                 )
             })
         }
+
+        
     }, [router.query])
 
-
+    // encode segments names in the url of a campaign in the new campaign creation view
+    // get tehe segments names and search the actual segments with this names
+    // create a list with this segments and add it to the campaign
+    // this runs when the user refreshes the page, or segments change, or when the user navigates from segments view to new campaign, resulting in creating a campaign with the segments from previous view
+    useEffect(() => {
+        try {
+            if(router?.query?.selected_segments) {
+                let segmentsNames = router?.query?.selected_segments.split(',')
+                segmentsNames.pop();
+                let segmentsToBeSetAsActive = [];
+                segmentsNames.map(segment_name_from_url => {
+                    segments.map(segment_from_service => {
+                        console.log()
+                        if(segment_from_service.name == segment_name_from_url) segmentsToBeSetAsActive.push(segment_from_service)
+                    })
+                })
+               
+                if(segmentsToBeSetAsActive.length) setCampaignSegments(segmentsToBeSetAsActive)
+            }
+        } catch(error) {
+            console.log(error)
+        }
+    }, [segments])
 
     useEffect(() => {
         setFilteredSegments(segments)
     }, [segments])
 
+    const addSegmentsToUrl = (segments) => routerService.updateUrlParam(router, 'selected_segments', segments.map(seg => seg.name + ',' ))
+
+
     const addSegmentToCampaign = segment => {
         if (campaignSegments.map(c => c.id).includes(segment.id)) {
-            setCampaignSegments(campaignSegments.filter(c => c.id !== segment.id))
+            let newSegments = campaignSegments.filter(c => c.id !== segment.id);
+            setCampaignSegments(newSegments)
+            addSegmentsToUrl(newSegments)
         } else {
-            setCampaignSegments(prev => [...prev, segment])
+            const newSegments = [...campaignSegments, segment];
+            setCampaignSegments(newSegments);
+            addSegmentsToUrl(newSegments);
         }
     }
 
@@ -143,10 +161,6 @@ function NewCampaign() {
         if (!e.target.value) setFilteredSegments(segments)
         setFilteredSegments(segments.filter(s => s.name.includes(e.target.value)))
     }
-
-    // useEffect(() => {
-    //     console.log(campaignSegments)
-    // }, [campaignSegments])
 
     return (
         <>

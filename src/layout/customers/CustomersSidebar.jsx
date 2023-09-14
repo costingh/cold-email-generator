@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import segmentsService from "@services/segments.service";
 import { selectSegmentsState, setSegmentsState } from "@store/segmentsSlice";
 import { selectContactsState, setContactsState } from "@store/contactsSlice";
+import routerService from "@services/router.service";
 
 function CustomersSidebar({handleOpenCreateContactModal, handleOpenCreateSegmentModal }) {
     const router = useRouter();
@@ -25,14 +26,7 @@ function CustomersSidebar({handleOpenCreateContactModal, handleOpenCreateSegment
     }
 
     const navigateTo = route => {
-        router.push(
-            {
-                pathname: '/dashboard',
-                query: { view: 'contacts', segment: route },
-            },
-            undefined,
-            { shallow: true }
-        );
+        routerService.navigate(router, '/dashboard', { view: 'contacts', segment: route }, true)
     }
 
     const removeQueryParam = (paramName) => {

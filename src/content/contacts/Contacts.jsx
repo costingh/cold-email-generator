@@ -12,6 +12,7 @@ import SkeletonLoading from '@components/SkeletonLoading';
 import ConfirmationModal from '@components/modals/ConfirmationModal';
 import { selectContactsState, setContactsState, removeContact } from "@store/contactsSlice";
 import { selectSegmentsState, selectCurrentSegment, setSegmentsState, setCurrentSegment, removeSegment } from "@store/segmentsSlice";
+import routerService from '@services/router.service';
 
 function Contacts({
     loadingContacts,
@@ -82,13 +83,9 @@ function Contacts({
 
     useEffect(() => {
         if (currentSegment) {
-            const currentQuery = { ...router.query };
-            currentQuery.segment = currentSegment.name;
-            router.push({
-                pathname: router.pathname, // keep the same URL path
-                query: currentQuery, // update the query parameters
-            });
+		    routerService.updateUrlParam(router, 'segment', currentSegment.name)
         }
+
     }, [currentSegment])
 
     const handleDeleteContact = (contact) => {
@@ -198,7 +195,6 @@ function Contacts({
                 <div className='table-row table-header'>
                     <div>Name</div>
                     <div>Job</div>
-                    {/* <div>Social Media</div> */}
                     <div>Location</div>
                     <div>Biography</div>
                     <div>Education</div>
@@ -223,7 +219,6 @@ function Contacts({
                             <span>{contact.job_title}</span>
                             <span><svg viewBox="0 0 24 24" width='14px' fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#808080"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" strokeLinejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M9 7H5C3.89543 7 3 7.89543 3 9V18C3 19.1046 3.89543 20 5 20H19C20.1046 20 21 19.1046 21 18V9C21 7.89543 20.1046 7 19 7H15M9 7V5C9 3.89543 9.89543 3 11 3H13C14.1046 3 15 3.89543 15 5V7M9 7H15" stroke="#808080" stroke-width="2" stroke-linecap="round" strokeLinejoin="round"></path> </g></svg>{contact.company}</span>
                         </div>
-                        {/* <div>Social Media</div> */}
                         <div>{contact.location}</div>
                         <div className='bibliography'>{contact.biography || 'Not available'}</div>
                         <div>{contact.education}</div>

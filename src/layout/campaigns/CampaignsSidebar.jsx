@@ -6,14 +6,7 @@ function CampaignsSidebar({ activeCampaigns, draftCampaigns }) {
     const router = useRouter();
 
     const goToCreateCampaign = () => {
-        router.push(
-            {
-                pathname: '/dashboard',
-                query: { view: 'campaigns', create_campaign: true, step: 'details' },
-            },
-            undefined,
-            { shallow: true }
-        );
+        routerService.navigate(router, '/dashboard', { view: 'campaigns', create_campaign: true, step: 'details' }, true)
     }
 
     return (
