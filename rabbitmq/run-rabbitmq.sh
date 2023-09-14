@@ -8,6 +8,13 @@ MANAGEMENT_PORT="15672"
 RABBITMQ_USERNAME="guest"
 RABBITMQ_PASSWORD="guest"
 
+# Check if a container with the same name already exists and stop/remove it
+if [ "$(docker ps -aq -f name=$CONTAINER_NAME)" ]; then
+    echo "Stopping and removing existing container '$CONTAINER_NAME'..."
+    docker stop $CONTAINER_NAME
+    docker rm $CONTAINER_NAME
+fi
+
 # Pull the RabbitMQ image
 echo "Pulling RabbitMQ image..."
 docker pull $RABBITMQ_IMAGE
