@@ -63,8 +63,8 @@ model Contact {
   biography    String?
   user_email   String
   User         User             @relation(fields: [user_email], references: [email])
-  links        String[]
-  social_media String[]
+  links        String?
+  social_media String?
   interests    String?
   createdAt    DateTime         @default(now())
   updatedAt    DateTime         @updatedAt

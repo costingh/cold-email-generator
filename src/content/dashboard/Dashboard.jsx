@@ -9,11 +9,12 @@ import { useDispatch, useSelector } from "react-redux";
 import ContactsService from '@services/contacts.service';
 import segmentsService from '@services/segments.service';
 import campaignService from '@services/campaign.service';
-import { selectContactsState, setContactsState } from "@store/contactsSlice";
+import { selectContactsState, setContactsState, addNewContact } from "@store/contactsSlice";
 import { selectSegmentsState, selectCurrentSegment, setSegmentsState, setCurrentSegment, removeSegment } from "@store/segmentsSlice";
 
 import useAuth from "/src/hook/auth";
 import DashboardContent from '/src/content/dashboard_content/DashboardContent';
+import contactsService from '@services/contacts.service';
 
 const _MOCK_CONTACTS = [
 	{
@@ -129,8 +130,14 @@ export default function Dashboard() {
 		async.eachLimit(contacts, 10,
 			(contact, cb) => {
 				ContactsService.createContact(contact, (error, res) => {
-					console.log('=====			', contact)
-					console.log(res)
+					if(res?.response) {
+						dispatch(addNewContact(contact))
+						contactsService.publishContact(contact, (err, resp) => {
+							console.log(err)
+							console.log(resp)
+
+						})
+					}
 					cb()
 				})
 			},

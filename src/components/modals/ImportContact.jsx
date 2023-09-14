@@ -36,9 +36,9 @@ function ImportContact({
                     job_title: '',
                     user_email: user?.email,
                     // segments: [],
-                    links: [],
-                    interests: [],
-                    social_media: [],
+                    links: '',
+                    interests: '',
+                    social_media: '',
                     biography: '',
                     education: '',
                     location: ''
@@ -65,11 +65,11 @@ function ImportContact({
                         } else if (headerValue.includes('location')) {
                             contact.location = value;
                         } else if (headerValue.includes('links')) {
-                            contact.location = value.split(',');
+                            contact.links = value;
                         } else if (headerValue.includes('interests')) {
-                            contact.location = value.split(',');
+                            contact.interests = value;
                         } else if (headerValue.includes('social' || 'social_media')) {
-                            contact.location = value.split(',');
+                            contact.social_media = value;
                         }
                     }
                 });

@@ -20,6 +20,12 @@ class ContactsService {
             .then(() => callback(null, 'Contact successfully deleted'))
             .catch((error) => callback(error, null));
     }
+
+    publishContact = (contactData: any, callback: (error: any | null, data: string | null) => void) => {
+        api.post('/api/rabbit/queue-contacts', { contactData: contactData })
+            .then((response) => callback(null, response?.data))
+            .catch((error) => callback(error, null));
+    }
 }
 
 export default new ContactsService();

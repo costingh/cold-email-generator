@@ -36,12 +36,6 @@ function Contacts({
     useEffect(() => {
         let _segment = segmentsList.find(seg => seg.name === segment) || null;
         dispatch(setCurrentSegment(_segment));
-
-        // if (_segment) {
-        //     segmentsService.getContactsFromSegment(_segment, (err, contacts) => {
-        //         dispatch(setContactsState(contacts))
-        //     })
-        // } 
     }, [router])
 
     useEffect(() => {

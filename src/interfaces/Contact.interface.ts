@@ -10,7 +10,7 @@ export interface ContactInterface {
 	biography?: string;
 	education?: string;
 	location?: string;
-	interests?: string[];
+	interests?: string;
 	user_email: string;
 	segments?: SegmentInterface[];
 	createdAt: Date;
