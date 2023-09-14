@@ -203,7 +203,7 @@ function Contacts({
                     <div>Biography</div>
                     <div>Education</div>
                     <div>Links</div>
-                    {/* <div>Interests</div> */}
+                    <div>Interests</div>
                 </div>
 
                 {!loadingContacts && paginatedData.length == 0 && <div className='no-contacts'>Cannot found any contacts matching this criteria</div>}
@@ -225,10 +225,12 @@ function Contacts({
                         </div>
                         {/* <div>Social Media</div> */}
                         <div>{contact.location}</div>
-                        <div className='bibliography'>{contact.biography}</div>
+                        <div className='bibliography'>{contact.biography || 'Not available'}</div>
                         <div>{contact.education}</div>
-                        <div>Links</div>
-                        {/* <div>Interests</div> */}
+                        <div className='links-wrapper'>
+                            {contact.links.split(',').map(l => <span className='link-of-contact' key={l}>{l}</span>)}
+                        </div>
+                        <div>{contact.interests || '-'}</div>
                     </div>
                 ))}
             </div>
