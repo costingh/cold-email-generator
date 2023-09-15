@@ -3,7 +3,7 @@ import {publishContact} from '../../../../rabbitmq/publisher';
 
 export default async function queue(req: any, res: any) {
     try {
-        publishContact({ceva:'ok'})
+        publishContact(req.body.contactData)
 
         res.send({
             error: null,
