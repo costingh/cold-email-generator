@@ -24,15 +24,16 @@ function Contacts({
 
     const router = useRouter();
     const { view, segment } = router.query;
-    
-    const [paginatedData, setPaginatedData] = useState([])
-    const [isFocusedContactId, setIsFocusedContactId] = useState(null)
-    const [confirmDeleteModal, setConfirmDeleteModal] = useState('');
-    const [currentContact, setCurrentContact] = useState(null)
 
     const contactsList = useSelector(selectContactsState);
     const segmentsList = useSelector(selectSegmentsState);
     const currentSegment = useSelector(selectCurrentSegment);
+
+    const [paginatedData, setPaginatedData] = useState([])
+    const [filteredContacts, setFilteredContacts] = useState(contactsList)
+    const [isFocusedContactId, setIsFocusedContactId] = useState(null)
+    const [confirmDeleteModal, setConfirmDeleteModal] = useState('');
+    const [currentContact, setCurrentContact] = useState(null)
 
     useEffect(() => {
         let _segment = segmentsList.find(seg => seg.name === segment) || null;
@@ -40,9 +41,9 @@ function Contacts({
     }, [router])
 
     useEffect(() => {
-        const paginatedContacts = paginate(contactsList, currentPage, pageSize);
+        const paginatedContacts = paginate(filteredContacts, currentPage, pageSize);
         setPaginatedData(paginatedContacts)
-    }, [contactsList, currentPage, pageSize])
+    }, [filteredContacts, currentPage, pageSize])
 
     const handleDeleteSegment = () => {
         setConfirmDeleteModal('segment_delete')
@@ -92,6 +93,48 @@ function Contacts({
         setCurrentContact(contact)
         setConfirmDeleteModal('contact_delete')
     }
+
+    const contactsEmptyFilters = {
+
+    }
+    const [contactsFilters, setContactsFilters] = useState(contactsEmptyFilters)
+
+    const resetContactsFilters = () => setContactsFilters(contactsEmptyFilters)
+
+    const handleFilterChange = (e, filter_type) => {
+        switch (filter_type) {
+            case 'filter_by_name':
+                setContactsFilters({ ...contactsFilters, email: e.target.value })
+                setContactsFilters({ ...contactsFilters, name: e.target.value })
+                break;
+            case 'filter_by_location':
+                setContactsFilters({ ...contactsFilters, location: e.target.value })
+                break;
+            case 'filter_by_job':
+                setContactsFilters({ ...contactsFilters, job_title: e.target.value })
+                break;
+            case 'filter_by_biography':
+                setContactsFilters({ ...contactsFilters, biography: e.target.value })
+                break;
+           
+            default:
+                break;
+        }
+    }
+
+    useEffect(() => {
+        let filteredResults = [...contactsList];
+        
+        if(contactsFilters?.name) filteredResults = filteredResults.filter(c => c.name.toLowerCase().includes(contactsFilters?.name))
+        if(contactsFilters?.email) filteredResults = filteredResults.filter(c => c.email.toLowerCase().includes(contactsFilters?.email))
+        if(contactsFilters?.location) filteredResults = filteredResults.filter(c => c.location.toLowerCase().includes(contactsFilters?.location))
+        if(contactsFilters?.job_title) filteredResults = filteredResults.filter(c => c.job_title.toLowerCase().includes(contactsFilters?.job_title))
+        if(contactsFilters?.biography) filteredResults = filteredResults.filter(c => c.biography.toLowerCase().includes(contactsFilters?.biography))
+
+        setFilteredContacts(filteredResults)
+
+    }, [contactsFilters, contactsList])
+
     return (
         <>
             <div className='d-flex align-items-center space-between mt-3'>
@@ -163,29 +206,29 @@ function Contacts({
                 <div className='option'>
                     <span>Search by email or name</span>
                     <div>
-                        <svg viewBox="0 0 32 32" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink" xmlnssketch="http://www.bohemiancoding.com/sketch/ns" fill="#111"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" strokeLinejoin="round"></g><g id="SVGRepo_iconCarrier"> <title>search</title> <desc>Created with Sketch Beta.</desc> <defs> </defs> <g id="Page-1" stroke="none" stroke-width="1" fill="none" fillRule="evenodd" type="MSPage"> <g id="Icon-Set" type="MSLayerGroup" transform="translate(-256.000000, -1139.000000)" fill="#111"> <path d="M269.46,1163.45 C263.17,1163.45 258.071,1158.44 258.071,1152.25 C258.071,1146.06 263.17,1141.04 269.46,1141.04 C275.75,1141.04 280.85,1146.06 280.85,1152.25 C280.85,1158.44 275.75,1163.45 269.46,1163.45 L269.46,1163.45 Z M287.688,1169.25 L279.429,1161.12 C281.591,1158.77 282.92,1155.67 282.92,1152.25 C282.92,1144.93 276.894,1139 269.46,1139 C262.026,1139 256,1144.93 256,1152.25 C256,1159.56 262.026,1165.49 269.46,1165.49 C272.672,1165.49 275.618,1164.38 277.932,1162.53 L286.224,1170.69 C286.629,1171.09 287.284,1171.09 287.688,1170.69 C288.093,1170.3 288.093,1169.65 287.688,1169.25 L287.688,1169.25 Z" id="search" type="MSShapeGroup"> </path> </g> </g> </g></svg>
-                        <input type='text' placeholder='john.doe@gmail.com' />
+                        <Icon icon='user' />
+                        <input type='text' placeholder='john.doe@gmail.com' onChange={(e) => handleFilterChange(e, 'filter_by_name')}/>
                     </div>
                 </div>
                 <div className='option'>
                     <span>Search by location</span>
                     <div>
-                        <svg viewBox="0 0 32 32" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink" xmlnssketch="http://www.bohemiancoding.com/sketch/ns" fill="#111"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" strokeLinejoin="round"></g><g id="SVGRepo_iconCarrier"> <title>search</title> <desc>Created with Sketch Beta.</desc> <defs> </defs> <g id="Page-1" stroke="none" stroke-width="1" fill="none" fillRule="evenodd" type="MSPage"> <g id="Icon-Set" type="MSLayerGroup" transform="translate(-256.000000, -1139.000000)" fill="#111"> <path d="M269.46,1163.45 C263.17,1163.45 258.071,1158.44 258.071,1152.25 C258.071,1146.06 263.17,1141.04 269.46,1141.04 C275.75,1141.04 280.85,1146.06 280.85,1152.25 C280.85,1158.44 275.75,1163.45 269.46,1163.45 L269.46,1163.45 Z M287.688,1169.25 L279.429,1161.12 C281.591,1158.77 282.92,1155.67 282.92,1152.25 C282.92,1144.93 276.894,1139 269.46,1139 C262.026,1139 256,1144.93 256,1152.25 C256,1159.56 262.026,1165.49 269.46,1165.49 C272.672,1165.49 275.618,1164.38 277.932,1162.53 L286.224,1170.69 C286.629,1171.09 287.284,1171.09 287.688,1170.69 C288.093,1170.3 288.093,1169.65 287.688,1169.25 L287.688,1169.25 Z" id="search" type="MSShapeGroup"> </path> </g> </g> </g></svg>
-                        <input type='text' placeholder='United States' />
+                        <Icon icon='location' />
+                        <input type='text' placeholder='United States' onChange={(e) => handleFilterChange(e, 'filter_by_location')}/>
                     </div>
                 </div>
                 <div className='option'>
                     <span>Search by job</span>
                     <div>
-                        <svg viewBox="0 0 32 32" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink" xmlnssketch="http://www.bohemiancoding.com/sketch/ns" fill="#111"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" strokeLinejoin="round"></g><g id="SVGRepo_iconCarrier"> <title>search</title> <desc>Created with Sketch Beta.</desc> <defs> </defs> <g id="Page-1" stroke="none" stroke-width="1" fill="none" fillRule="evenodd" type="MSPage"> <g id="Icon-Set" type="MSLayerGroup" transform="translate(-256.000000, -1139.000000)" fill="#111"> <path d="M269.46,1163.45 C263.17,1163.45 258.071,1158.44 258.071,1152.25 C258.071,1146.06 263.17,1141.04 269.46,1141.04 C275.75,1141.04 280.85,1146.06 280.85,1152.25 C280.85,1158.44 275.75,1163.45 269.46,1163.45 L269.46,1163.45 Z M287.688,1169.25 L279.429,1161.12 C281.591,1158.77 282.92,1155.67 282.92,1152.25 C282.92,1144.93 276.894,1139 269.46,1139 C262.026,1139 256,1144.93 256,1152.25 C256,1159.56 262.026,1165.49 269.46,1165.49 C272.672,1165.49 275.618,1164.38 277.932,1162.53 L286.224,1170.69 C286.629,1171.09 287.284,1171.09 287.688,1170.69 C288.093,1170.3 288.093,1169.65 287.688,1169.25 L287.688,1169.25 Z" id="search" type="MSShapeGroup"> </path> </g> </g> </g></svg>
-                        <input type='text' placeholder='Marketing Specialist' />
+                        <Icon icon='job' />
+                        <input type='text' placeholder='Marketing Specialist' onChange={(e) => handleFilterChange(e, 'filter_by_job')}/>
                     </div>
                 </div>
                 <div className='option'>
                     <span>Search by biography</span>
                     <div>
-                        <svg viewBox="0 0 32 32" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink" xmlnssketch="http://www.bohemiancoding.com/sketch/ns" fill="#111"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" strokeLinejoin="round"></g><g id="SVGRepo_iconCarrier"> <title>search</title> <desc>Created with Sketch Beta.</desc> <defs> </defs> <g id="Page-1" stroke="none" stroke-width="1" fill="none" fillRule="evenodd" type="MSPage"> <g id="Icon-Set" type="MSLayerGroup" transform="translate(-256.000000, -1139.000000)" fill="#111"> <path d="M269.46,1163.45 C263.17,1163.45 258.071,1158.44 258.071,1152.25 C258.071,1146.06 263.17,1141.04 269.46,1141.04 C275.75,1141.04 280.85,1146.06 280.85,1152.25 C280.85,1158.44 275.75,1163.45 269.46,1163.45 L269.46,1163.45 Z M287.688,1169.25 L279.429,1161.12 C281.591,1158.77 282.92,1155.67 282.92,1152.25 C282.92,1144.93 276.894,1139 269.46,1139 C262.026,1139 256,1144.93 256,1152.25 C256,1159.56 262.026,1165.49 269.46,1165.49 C272.672,1165.49 275.618,1164.38 277.932,1162.53 L286.224,1170.69 C286.629,1171.09 287.284,1171.09 287.688,1170.69 C288.093,1170.3 288.093,1169.65 287.688,1169.25 L287.688,1169.25 Z" id="search" type="MSShapeGroup"> </path> </g> </g> </g></svg>
-                        <input type='text' placeholder='Digital marketing' />
+                        <Icon icon='biography' />
+                        <input type='text' placeholder='Digital marketing' onChange={(e) => handleFilterChange(e, 'filter_by_biography')}/>
                     </div>
                 </div>
             </div>}
